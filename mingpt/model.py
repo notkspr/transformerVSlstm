@@ -88,7 +88,8 @@ class Block(nn.Module):
             dropout = nn.Dropout(config.resid_pdrop),
         ))
         m = self.mlp
-        self.mlpf = lambda x: m.dropout(m.c_proj(m.act(m.c_fc(x)))) # MLP forward
+        # ModuleDict does not expose keys as attributes; use indexing
+        self.mlpf = lambda x: m['dropout'](m['c_proj'](m['act'](m['c_fc'](x)))) # MLP forward
 
     def forward(self, x, attention_mask=None):
         x = x + self.attn(self.ln_1(x), attention_mask)
@@ -115,14 +116,18 @@ class LSTMClassifier(nn.Module):
     
     def __init__(self, config):
         super().__init__()
-        assert config.vocab_size is not None
-        assert config.block_size is not None
+        # basic sanity checks
+        assert config.vocab_size is not None, "config.vocab_size must be set for LSTMClassifier"
+        assert config.block_size is not None, "config.block_size must be set for LSTMClassifier"
+        assert config.n_layer is not None, "config.n_layer must be set for LSTMClassifier"
+        assert config.n_embd is not None, "config.n_embd must be set for LSTMClassifier"
 
         self.embedding = nn.Embedding(config.vocab_size, config.n_embd)
         
         # Encoder LSTM - using original lstm parameter for encoder
-        self.lstm = nn.LSTM(config.n_embd, config.block_size, config.n_layer,
-                           batch_first=True, dropout=config.dropout if config.n_layer > 1 else 0)
+        num_layers = int(config.n_layer)
+        self.lstm = nn.LSTM(config.n_embd, config.block_size, num_layers,
+                           batch_first=True, dropout=config.dropout if num_layers > 1 else 0)
         
         # Attention mechanism
         self.attention = nn.Linear(config.block_size, 1)
@@ -136,9 +141,11 @@ class LSTMClassifier(nn.Module):
         self.fc = nn.Linear(config.block_size, config.num_classes)
 
     def forward(self, input_ids, attention_mask, labels=None):
+        # embed and ensure attention_mask is float on the same device/dtype
         embedded = self.embedding(input_ids)
+        attention_mask = attention_mask.to(dtype=embedded.dtype, device=embedded.device)
 
-        # Apply attention mask
+        # Apply attention mask (zeros out embeddings for padded tokens)
         embedded = embedded * attention_mask.unsqueeze(-1)
 
         # Encoder LSTM forward pass
@@ -361,6 +368,9 @@ class GPT(nn.Module):
         pos_emb = self.transformer.wpe(pos) # position embeddings of shape (1, t, n_embd)
         x = self.transformer.drop(tok_emb + pos_emb)
         
+        # ensure attention_mask is float on same device/dtype when used for pooling or passed to blocks
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(dtype=x.dtype, device=x.device)
         for block in self.transformer.h:
             x = block(x, attention_mask)
         x = self.transformer.ln_f(x)
@@ -370,7 +380,8 @@ class GPT(nn.Module):
             # Apply attention mask and compute mean over valid tokens
             mask_expanded = attention_mask.unsqueeze(-1).expand_as(x)
             x_masked = x * mask_expanded
-            pooled = x_masked.sum(dim=1) / attention_mask.sum(dim=1, keepdim=True)
+            denom = attention_mask.sum(dim=1, keepdim=True).to(x.dtype) + 1e-8
+            pooled = x_masked.sum(dim=1) / denom
         else:
             # Simple mean pooling if no attention mask
             pooled = x.mean(dim=1)
