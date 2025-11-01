@@ -92,6 +92,83 @@ class Block(nn.Module):
         x = x + self.mlpf(self.ln_2(x))
         return x
 
+class LSTMClassifier(nn.Module):
+    """ LSTM based text classifier with encoder-attention-decoder architecture"""
+    @staticmethod
+    def get_default_config():
+        C = CN()
+        # either model_type or (n_layer, n_embd) must be given in the config
+        C.model_type = 'lstm'
+        C.n_layer = None
+        C.n_embd =  None
+        # these options must be filled in externally
+        C.vocab_size = None
+        C.block_size = None
+        # dropout hyperparameters
+        C.dropout = 0.3
+        return C
+    
+    def __init__(self, config):
+        super().__init__()
+        assert config.vocab_size is not None
+        assert config.block_size is not None
+
+        self.embedding = nn.Embedding(config.vocab_size, config.n_embd)
+        
+        # Encoder LSTM - using original lstm parameter for encoder
+        self.lstm = nn.LSTM(config.n_embd, config.block_size, config.n_layer,
+                           batch_first=True, dropout=config.dropout if config.n_layer > 1 else 0)
+        
+        # Attention mechanism
+        self.attention = nn.Linear(config.block_size, 1)
+        
+        # Decoder LSTM
+        self.decoder_lstm = nn.LSTM(config.block_size, config.block_size, 1,
+                                   batch_first=True, dropout=0)
+        
+        self.dropout = nn.Dropout(config.dropout)
+        self.fc = nn.Linear(config.block_size, 1)
+
+    def forward(self, input_ids, attention_mask):
+        embedded = self.embedding(input_ids)
+
+        # Apply attention mask
+        embedded = embedded * attention_mask.unsqueeze(-1)
+
+        # Encoder LSTM forward pass
+        encoder_out, _ = self.lstm(embedded)
+
+        # Attention mechanism
+        # Compute attention weights for each time step
+        attention_weights = self.attention(encoder_out)  # (batch, seq_len, 1)
+        attention_weights = F.softmax(attention_weights, dim=1)
+        
+        # Apply attention mask to attention weights
+        attention_weights = attention_weights * attention_mask.unsqueeze(-1)
+        
+        # Normalize attention weights after masking
+        attention_sum = attention_weights.sum(dim=1, keepdim=True) + 1e-8
+        attention_weights = attention_weights / attention_sum
+        
+        # Compute attended features
+        attended_features = torch.sum(encoder_out * attention_weights, dim=1)  # (batch, hidden_size)
+        
+        # Decoder LSTM - process attended features
+        # Expand attended features to sequence length 1 for LSTM input
+        decoder_input = attended_features.unsqueeze(1)  # (batch, 1, hidden_size)
+        decoder_out, _ = self.decoder_lstm(decoder_input)
+        
+        # Get final hidden state from decoder
+        final_hidden_state = decoder_out[:, -1, :]
+
+        # Apply dropout and classification layer
+        output = self.dropout(final_hidden_state)
+        output = self.fc(output)
+
+        return output
+    
+
+
 class GPT(nn.Module):
     """ GPT Language Model """
 
