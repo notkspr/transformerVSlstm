@@ -140,6 +140,10 @@ class LSTMClassifier(nn.Module):
         # Changed to output num_classes instead of 1 for consistency with GPT
         self.fc = nn.Linear(config.block_size, config.num_classes)
 
+        # report number of parameters
+        n_params = sum(p.numel() for p in self.parameters())
+        print("LSTM: number of parameters: %.2fM" % (n_params/1e6,))
+
     def forward(self, input_ids, attention_mask, labels=None):
         # embed and ensure attention_mask is float on the same device/dtype
         embedded = self.embedding(input_ids)
@@ -258,7 +262,7 @@ class GPT(nn.Module):
 
         # report number of parameters
         n_params = sum(p.numel() for p in self.parameters())
-        print("number of parameters: %.2fM" % (n_params/1e6,))
+        print("Transformer: number of parameters: %.2fM" % (n_params/1e6,))
 
     def _init_weights(self, module):
         if isinstance(module, nn.Linear):
