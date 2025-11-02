@@ -76,15 +76,15 @@ class Encoder:
         ok so what is this regex looking for, exactly?
         python re reference: https://docs.python.org/3/library/re.html
         - the vertical bars | is OR, so re.findall will chunkate text as the pieces match, from left to right
-        - '\'s' would split up things like Andrej's -> (Andrej, 's)
-        - ' ?\p{L}': optional space followed by 1+ unicode code points in the category "letter"
-        - ' ?\p{N}': optional space followed by 1+ unicode code points in the category "number"
-        - ' ?[^\s\p{L}\p{N}]+': optional space, then 1+ things that are NOT a whitespace, letter or number
-        - '\s+(?!\S)': 1+ whitespace characters (e.g. space or tab or etc) UNLESS they are followed by non-whitespace
+        - '\\'s' would split up things like Andrej's -> (Andrej, 's)
+        - ' ?\\p{L}': optional space followed by 1+ unicode code points in the category "letter"
+        - ' ?\\p{N}': optional space followed by 1+ unicode code points in the category "number"
+        - ' ?[^\\s\\p{L}\\p{N}]+': optional space, then 1+ things that are NOT a whitespace, letter or number
+        - '\\s+(?!\\S)': 1+ whitespace characters (e.g. space or tab or etc) UNLESS they are followed by non-whitespace
                        so this will consume whitespace characters in a sequence but exclude the last whitespace in
                        that sequence. that last whitespace has the opportunity to then match the optional ' ?' in
                        earlier patterns.
-        - '\s+': 1+ whitespace characters, intended probably to catch a full trailing sequence of whitespaces at end of string
+        - '\\s+': 1+ whitespace characters, intended probably to catch a full trailing sequence of whitespaces at end of string
         So TLDR:
         - we are special casing a few common apostrophe constructs ('s, 't, 're, ...) and making those into separate tokens
         - we then separate out strings into consecutive chunks of 1) letters, 2) numbers, 3) non-letter-numbers, 4) whitespaces
@@ -259,6 +259,15 @@ class BPETokenizer:
 
     def __init__(self):
         self.encoder = get_encoder()
+
+    @property
+    def vocab_size(self):
+        """Return the vocabulary size of the BPE tokenizer"""
+        return len(self.encoder.encoder)  # 50257 tokens
+
+    def encode(self, text):
+        """Encode text to list of token IDs"""
+        return self.encoder.encode(text)
 
     def __call__(self, text, return_tensors='pt'):
         # PyTorch only; here because we want to match huggingface/transformers interface
