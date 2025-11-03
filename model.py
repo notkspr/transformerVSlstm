@@ -140,9 +140,28 @@ class LSTMClassifier(nn.Module):
         # Changed to output num_classes instead of 1 for consistency with GPT
         self.fc = nn.Linear(config.block_size, config.num_classes)
 
+        # Initialize weights similar to GPT
+        self.apply(self._init_weights)
+
         # report number of parameters
         n_params = sum(p.numel() for p in self.parameters())
         print("LSTM: number of parameters: %.2fM" % (n_params/1e6,))
+ 
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+        elif isinstance(module, nn.LSTM):
+            for name, param in module.named_parameters():
+                if 'weight_ih' in name:
+                    torch.nn.init.xavier_uniform_(param.data)
+                elif 'weight_hh' in name:
+                    torch.nn.init.orthogonal_(param.data)
+                elif 'bias' in name:
+                    torch.nn.init.zeros_(param.data)
 
     def forward(self, input_ids, attention_mask, labels=None):
         # embed and ensure attention_mask is float on the same device/dtype
