@@ -2,3 +2,5 @@ torch
 datasets
 regex
 matplotlib
+scikit-learn
+seaborn
