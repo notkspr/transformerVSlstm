@@ -68,13 +68,18 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 
-# Create model configs
+# Create model configs with unified parameters
 lstm_config = LSTMClassifier.get_default_config()
 lstm_config.vocab_size = VOCAB_SIZE
 lstm_config.block_size = HIDDEN_DIM
 lstm_config.n_embd = EMBEDDING_DIM
 lstm_config.n_layer = NUM_LAYERS
+lstm_config.n_head = NUM_HEADS
+# Use same dropout parameter names as GPT for consistency
 lstm_config.dropout = DROPOUT
+lstm_config.embd_pdrop = DROPOUT
+lstm_config.resid_pdrop = DROPOUT
+lstm_config.attn_pdrop = DROPOUT
 lstm_config.num_classes = 2
 
 gpt_config = GPT.get_default_config()

@@ -26,52 +26,87 @@ class NewGELU(nn.Module):
     def forward(self, x):
         return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
 
-class BidirectionalSelfAttention(nn.Module):
+class UnifiedMultiHeadAttention(nn.Module):
     """
-    A vanilla multi-head bidirectional self-attention layer with a projection at the end.
-    Removed causal masking to allow attention to all positions.
+    Unified multi-head self-attention mechanism used by both LSTM and Transformer models.
+    Supports both causal and bidirectional attention patterns.
     """
-
-    def __init__(self, config):
+    def __init__(self, config, causal=False):
         super().__init__()
         assert config.n_embd % config.n_head == 0
-        # key, query, value projections for all heads, but in a batch
-        self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
-        # output projection
-        self.c_proj = nn.Linear(config.n_embd, config.n_embd)
-        # regularization
-        self.attn_dropout = nn.Dropout(config.attn_pdrop)
-        self.resid_dropout = nn.Dropout(config.resid_pdrop)
+        
         self.n_head = config.n_head
         self.n_embd = config.n_embd
+        self.head_dim = config.n_embd // config.n_head
+        self.causal = causal
+        
+        # Unified Q, K, V projections
+        self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
+        # Output projection
+        self.c_proj = nn.Linear(config.n_embd, config.n_embd)
+        
+        # Dropout - use different dropout rates based on config availability
+        attn_dropout_rate = getattr(config, 'attn_pdrop', getattr(config, 'dropout', 0.1))
+        resid_dropout_rate = getattr(config, 'resid_pdrop', getattr(config, 'dropout', 0.1))
+        
+        self.attn_dropout = nn.Dropout(attn_dropout_rate)
+        self.resid_dropout = nn.Dropout(resid_dropout_rate)
+        
+        # Register causal mask buffer if needed
+        if causal:
+            # This will be filled in during forward pass based on sequence length
+            self.register_buffer("causal_mask", None, persistent=False)
 
     def forward(self, x, attention_mask=None):
-        B, T, C = x.size() # batch size, sequence length, embedding dimensionality (n_embd)
-
-        # calculate query, key, values for all heads in batch and move head forward to be the batch dim
-        q, k ,v  = self.c_attn(x).split(self.n_embd, dim=2)
-        k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
-        q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
-        v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
-
-        # bidirectional self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
-        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+        B, T, C = x.size()  # batch size, sequence length, embedding dimensionality
         
-        # Apply attention mask if provided (for padding tokens)
+        # Calculate Q, K, V for all heads in batch
+        qkv = self.c_attn(x)
+        q, k, v = qkv.split(self.n_embd, dim=2)
+        
+        # Reshape for multi-head attention: (B, T, n_head, head_dim) -> (B, n_head, T, head_dim)  
+        q = q.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
+        k = k.view(B, T, self.n_head, self.head_dim).transpose(1, 2)  
+        v = v.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
+        
+        # Scaled dot-product attention
+        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(self.head_dim))
+        
+        # Apply causal mask if needed (for autoregressive models)
+        if self.causal:
+            if self.causal_mask is None or self.causal_mask.size(0) < T:
+                # Create causal mask
+                causal_mask = torch.tril(torch.ones(T, T, device=x.device, dtype=torch.bool))
+                self.register_buffer("causal_mask", causal_mask, persistent=False)
+            att = att.masked_fill(~self.causal_mask[:T, :T], float('-inf'))
+        
+        # Apply padding mask if provided
         if attention_mask is not None:
-            # Convert attention mask to attention weights mask
-            mask = attention_mask.unsqueeze(1).unsqueeze(2)  # (B, 1, 1, T)
-            mask = mask.expand(B, self.n_head, T, T)  # (B, nh, T, T)
+            # Convert attention mask to shape (B, 1, 1, T) for broadcasting
+            mask = attention_mask.unsqueeze(1).unsqueeze(2)
             att = att.masked_fill(mask == 0, float('-inf'))
         
+        # Softmax and dropout
         att = F.softmax(att, dim=-1)
         att = self.attn_dropout(att)
-        y = att @ v # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
-        y = y.transpose(1, 2).contiguous().view(B, T, C) # re-assemble all head outputs side by side
-
-        # output projection
+        
+        # Apply attention to values
+        y = att @ v  # (B, n_head, T, T) x (B, n_head, T, head_dim) -> (B, n_head, T, head_dim)
+        
+        # Concatenate heads: (B, n_head, T, head_dim) -> (B, T, n_head * head_dim)
+        y = y.transpose(1, 2).contiguous().view(B, T, C)
+        
+        # Output projection and dropout
         y = self.resid_dropout(self.c_proj(y))
         return y
+
+class BidirectionalSelfAttention(UnifiedMultiHeadAttention):
+    """
+    Bidirectional self-attention layer using the unified attention mechanism.
+    This is a wrapper for backward compatibility with existing transformer code.
+    """
+    def __init__(self, config):
+        super().__init__(config, causal=False)  # Bidirectional = non-causal
 
 class Block(nn.Module):
     """ an unassuming Transformer block """
@@ -96,20 +131,62 @@ class Block(nn.Module):
         x = x + self.mlpf(self.ln_2(x))
         return x
 
+class LSTMAttentionBlock(nn.Module):
+    """
+    A single LSTM layer with self-attention mechanism using the unified attention implementation.
+    Each block consists of:
+    1. LSTM layer
+    2. Unified multi-head self-attention 
+    3. Residual connection and layer normalization
+    """
+    def __init__(self, config):
+        super().__init__()
+        self.hidden_size = config.n_embd
+        
+        # LSTM layer
+        self.lstm = nn.LSTM(self.hidden_size, self.hidden_size, 1, 
+                           batch_first=True, dropout=0)
+        
+        # Unified multi-head self-attention (same as used in transformer)
+        self.attn = UnifiedMultiHeadAttention(config, causal=False)
+        
+        # Layer normalization
+        self.ln1 = nn.LayerNorm(self.hidden_size)
+        self.ln2 = nn.LayerNorm(self.hidden_size)
+        
+    def forward(self, x, attention_mask=None):
+        # Store residual for later
+        residual = x
+        
+        # 1. LSTM processing with residual connection
+        lstm_out, _ = self.lstm(x)
+        x = self.ln1(lstm_out + residual)
+        
+        # 2. Multi-head self-attention with residual connection
+        residual = x
+        attn_out = self.attn(x, attention_mask)
+        x = self.ln2(attn_out + residual)
+        
+        return x
+
 class LSTMClassifier(nn.Module):
-    """ LSTM based text classifier with encoder-attention-decoder architecture"""
+    """ LSTM-based text classifier with per-layer attention mechanism (similar to transformer architecture)"""
     @staticmethod
     def get_default_config():
         C = CN()
         # either model_type or (n_layer, n_embd) must be given in the config
         C.model_type = 'lstm'
         C.n_layer = None
-        C.n_embd =  None
+        C.n_embd = None
+        C.n_head = 4  # Number of attention heads
         # these options must be filled in externally
         C.vocab_size = None
         C.block_size = None
-        # dropout hyperparameters
+        # dropout hyperparameters (compatible with GPT config names)
         C.dropout = 0.3
+        C.embd_pdrop = 0.1  # Embedding dropout (same as GPT)
+        C.resid_pdrop = 0.1  # Residual dropout (same as GPT) 
+        C.attn_pdrop = 0.1   # Attention dropout (same as GPT)
         # classification specific
         C.num_classes = 2  # for binary sentiment classification
         return C
@@ -122,65 +199,74 @@ class LSTMClassifier(nn.Module):
         assert config.n_layer is not None, "config.n_layer must be set for LSTMClassifier"
         assert config.n_embd is not None, "config.n_embd must be set for LSTMClassifier"
 
+        self.config = config
+        
+        # Embedding layer with dropout (matching GPT architecture)
         self.embedding = nn.Embedding(config.vocab_size, config.n_embd)
+        self.embd_dropout = nn.Dropout(getattr(config, 'embd_pdrop', config.dropout))
         
-        # Encoder LSTM - using original lstm parameter for encoder
-        num_layers = int(config.n_layer)
-        self.lstm = nn.LSTM(config.n_embd, config.block_size, num_layers,
-                           batch_first=True, dropout=config.dropout if num_layers > 1 else 0)
+        # Stack of LSTM-Attention blocks
+        self.layers = nn.ModuleList([
+            LSTMAttentionBlock(config) for _ in range(config.n_layer)
+        ])
         
-        # Attention mechanism
-        self.attention = nn.Linear(config.block_size, 1)
+        # Final layer norm
+        self.ln_f = nn.LayerNorm(config.n_embd)
         
-        # Decoder LSTM
-        self.decoder_lstm = nn.LSTM(config.block_size, config.block_size, 1,
-                                   batch_first=True, dropout=0)
-        
+        # Dropout and classification head
         self.dropout = nn.Dropout(config.dropout)
-        # Changed to output num_classes instead of 1 for consistency with GPT
-        self.fc = nn.Linear(config.block_size, config.num_classes)
+        self.classifier = nn.Linear(config.n_embd, config.num_classes)
 
+        # Initialize weights
+        self.apply(self._init_weights)
+        
         # report number of parameters
         n_params = sum(p.numel() for p in self.parameters())
-        print("LSTM: number of parameters: %.2fM" % (n_params/1e6,))
+        print("LSTM with Attention: number of parameters: %.2fM" % (n_params/1e6,))
+
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+        elif isinstance(module, nn.LayerNorm):
+            torch.nn.init.zeros_(module.bias)
+            torch.nn.init.ones_(module.weight)
 
     def forward(self, input_ids, attention_mask, labels=None):
-        # embed and ensure attention_mask is float on the same device/dtype
-        embedded = self.embedding(input_ids)
-        attention_mask = attention_mask.to(dtype=embedded.dtype, device=embedded.device)
-
-        # Apply attention mask (zeros out embeddings for padded tokens)
-        embedded = embedded * attention_mask.unsqueeze(-1)
-
-        # Encoder LSTM forward pass
-        encoder_out, _ = self.lstm(embedded)
-
-        # Attention mechanism
-        # Compute attention weights for each time step
-        attention_weights = self.attention(encoder_out)  # (batch, seq_len, 1)
-        attention_weights = F.softmax(attention_weights, dim=1)
+        # Embed tokens with dropout (matching GPT architecture)
+        x = self.embedding(input_ids)  # (batch, seq_len, n_embd)
+        x = self.embd_dropout(x)
         
-        # Apply attention mask to attention weights
-        attention_weights = attention_weights * attention_mask.unsqueeze(-1)
+        # Ensure attention_mask is float on the same device/dtype
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(dtype=x.dtype, device=x.device)
+            # Apply attention mask to embeddings (zero out padded tokens)
+            x = x * attention_mask.unsqueeze(-1)
         
-        # Normalize attention weights after masking
-        attention_sum = attention_weights.sum(dim=1, keepdim=True) + 1e-8
-        attention_weights = attention_weights / attention_sum
+        # Pass through each LSTM-Attention block
+        for layer in self.layers:
+            x = layer(x, attention_mask)
         
-        # Compute attended features
-        attended_features = torch.sum(encoder_out * attention_weights, dim=1)  # (batch, hidden_size)
+        # Final layer normalization
+        x = self.ln_f(x)
         
-        # Decoder LSTM - process attended features
-        # Expand attended features to sequence length 1 for LSTM input
-        decoder_input = attended_features.unsqueeze(1)  # (batch, 1, hidden_size)
-        decoder_out, _ = self.decoder_lstm(decoder_input)
+        # Global average pooling with attention mask
+        if attention_mask is not None:
+            # Apply attention mask and compute mean over valid tokens
+            mask_expanded = attention_mask.unsqueeze(-1).expand_as(x)
+            x_masked = x * mask_expanded
+            denom = attention_mask.sum(dim=1, keepdim=True).to(x.dtype) + 1e-8
+            pooled = x_masked.sum(dim=1) / denom
+        else:
+            # Simple mean pooling if no attention mask
+            pooled = x.mean(dim=1)
         
-        # Get final hidden state from decoder
-        final_hidden_state = decoder_out[:, -1, :]
-
-        # Apply dropout and classification layer
-        output = self.dropout(final_hidden_state)
-        logits = self.fc(output)
+        # Classification
+        pooled = self.dropout(pooled)
+        logits = self.classifier(pooled)
 
         # Calculate loss if labels are provided
         loss = None
