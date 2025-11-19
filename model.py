@@ -216,6 +216,12 @@ class LSTMClassifier(nn.Module):
         # Dropout and classification head
         self.dropout = nn.Dropout(config.dropout)
         self.classifier = nn.Linear(config.n_embd, config.num_classes)
+        
+        # Language modeling head for pre-training (shares weights with embedding)
+        self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
+        
+        # Tie weights between word embeddings and language modeling head (same as GPT)
+        self.lm_head.weight = self.embedding.weight
 
         # Initialize weights
         self.apply(self._init_weights)
@@ -275,6 +281,32 @@ class LSTMClassifier(nn.Module):
 
         return logits, loss
     
+    def get_hidden_states(self, input_ids, attention_mask=None):
+        """Get hidden states for language modeling"""
+        # Embed tokens with dropout
+        x = self.embedding(input_ids)
+        x = self.embd_dropout(x)
+        
+        # Ensure attention_mask is float on the same device/dtype
+        if attention_mask is not None:
+            attention_mask = attention_mask.to(dtype=x.dtype, device=x.device)
+            # Apply attention mask to embeddings (zero out padded tokens)
+            x = x * attention_mask.unsqueeze(-1)
+        
+        # Pass through each LSTM-Attention block
+        for layer in self.layers:
+            x = layer(x, attention_mask)
+        
+        # Final layer normalization
+        x = self.ln_f(x)
+        
+        return x
+    
+    def forward_lm(self, input_ids, attention_mask=None):
+        """Forward pass for language modeling (pre-training)"""
+        hidden_states = self.get_hidden_states(input_ids, attention_mask)
+        logits = self.lm_head(hidden_states)
+        return logits
 
 
 class GPT(nn.Module):
@@ -336,9 +368,15 @@ class GPT(nn.Module):
             ln_f = nn.LayerNorm(config.n_embd),
         ))
         
-        # Classification head instead of language modeling head
+        # Classification head for fine-tuning
         self.classifier = nn.Linear(config.n_embd, config.num_classes)
         self.dropout = nn.Dropout(config.embd_pdrop)
+        
+        # Language modeling head for pre-training
+        self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
+        
+        # Tie weights between word embeddings and language modeling head
+        self.lm_head.weight = self.transformer.wte.weight
 
         # init all weights, and apply a special scaled init to the residual projections, per GPT-2 paper
         self.apply(self._init_weights)
@@ -486,3 +524,26 @@ class GPT(nn.Module):
             loss = F.cross_entropy(logits, labels)
 
         return logits, loss
+    
+    def get_hidden_states(self, input_ids):
+        """Get hidden states for language modeling (used during pre-training)."""
+        device = input_ids.device
+        b, t = input_ids.size()
+        assert t <= self.block_size, f"Cannot forward sequence of length {t}, block size is only {self.block_size}"
+        pos = torch.arange(0, t, dtype=torch.long, device=device).unsqueeze(0)
+        
+        # Forward through transformer
+        tok_emb = self.transformer.wte(input_ids)
+        pos_emb = self.transformer.wpe(pos)
+        x = self.transformer.drop(tok_emb + pos_emb)
+        
+        for block in self.transformer.h:
+            x = block(x)
+        x = self.transformer.ln_f(x)
+        
+        return x
+    
+    def forward_lm(self, input_ids, attention_mask=None):
+        """Forward pass for language modeling (next token prediction)."""
+        hidden_states = self.get_hidden_states(input_ids)
+        return self.lm_head(hidden_states)
