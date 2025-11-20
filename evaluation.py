@@ -529,8 +529,9 @@ class ModelEvaluator:
                 lstm_params = best_lstm.get('total_parameters', 0)
                 gpt_params = best_gpt.get('total_parameters', 0)
                 
+                # Use shorter column headers to prevent overflow
                 table_data = [
-                    ['Metric', f'LSTM with Attention ({lstm_params:,})', f'Transformer ({gpt_params:,})'],
+                    ['Metric', f'LSTM w/ Attention\n({lstm_params:,} params)', f'Transformer\n({gpt_params:,} params)'],
                     ['Accuracy', f"{best_lstm['accuracy']:.3f}", f"{best_gpt['accuracy']:.3f}"],
                     ['F1 Score', f"{best_lstm['f1_score']:.3f}", f"{best_gpt['f1_score']:.3f}"],
                     ['Precision', f"{best_lstm['precision']:.3f}", f"{best_gpt['precision']:.3f}"],
@@ -541,9 +542,20 @@ class ModelEvaluator:
                 table = axes[5].table(cellText=table_data[1:], colLabels=table_data[0], 
                                     loc='center', cellLoc='center')
                 table.auto_set_font_size(False)
-                table.set_fontsize(10)
-                table.scale(1, 2)
-                axes[5].set_title('Best Fine-tuned Model Comparison', fontweight='bold')
+                table.set_fontsize(8)  # Reduced font size
+                table.scale(1.2, 1.8)  # Better scaling proportions
+                
+                # Adjust column widths to prevent overflow
+                cellDict = table.get_celld()
+                for i in range(len(table_data)):
+                    for j in range(len(table_data[0])):
+                        cellDict[(i, j)].set_width(0.3)  # Set uniform column width
+                        cellDict[(i, j)].set_height(0.15)  # Set row height
+                        if i == 0:  # Header row
+                            cellDict[(i, j)].set_facecolor('#E6E6FA')
+                            cellDict[(i, j)].set_text_props(weight='bold')
+                
+                axes[5].set_title('Best Fine-tuned Model Comparison', fontweight='bold', pad=20)
             
             plt.tight_layout()
             plt.savefig(self.evaluation_dir / 'finetuning_comprehensive_comparison.png', dpi=300, bbox_inches='tight')
