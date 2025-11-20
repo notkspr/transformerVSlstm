@@ -1,153 +1,157 @@
 {
   "model_name": "gpt",
-  "total_pretrain_epochs": 10,
+  "total_pretrain_epochs": 8,
   "total_finetune_epochs": 0,
   "pretrain_history": [
     {
       "epoch": 1,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763594625.0638864,
+      "timestamp": 1763649678.1914053,
       "metrics": {
-        "train_loss": 7.361404772211865,
-        "perplexity": 1574.046186928763,
-        "total_tokens": 5337660.0
+        "train_loss": 7.45630511714191,
+        "perplexity": 1730.741342089774,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1164.8348741531372,
+        "elapsed_time": 1164.8349297046661
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     },
     {
       "epoch": 2,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763595667.401613,
+      "timestamp": 1763650852.6569836,
       "metrics": {
-        "train_loss": 6.173008997265885,
-        "perplexity": 479.6271337118931,
-        "total_tokens": 5337660.0
+        "train_loss": 6.228872289017933,
+        "perplexity": 507.18320480398233,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1174.4276659488678,
+        "elapsed_time": 2339.300361633301
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     },
     {
       "epoch": 3,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763596706.6968765,
+      "timestamp": 1763652020.574388,
       "metrics": {
-        "train_loss": 5.725564189073516,
-        "perplexity": 306.60620032283026,
-        "total_tokens": 5337660.0
+        "train_loss": 5.740533725517552,
+        "perplexity": 311.23047830837874,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1167.8905975818634,
+        "elapsed_time": 3507.217994451523
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     },
     {
       "epoch": 4,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763597745.3606975,
+      "timestamp": 1763653188.416043,
       "metrics": {
-        "train_loss": 5.411793796027579,
-        "perplexity": 224.03309713954337,
-        "total_tokens": 5337660.0
+        "train_loss": 5.392522423732571,
+        "perplexity": 219.757007316732,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1167.8187363147736,
+        "elapsed_time": 4675.059664011002
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     },
     {
       "epoch": 5,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763598847.5597684,
+      "timestamp": 1763654356.7863758,
       "metrics": {
-        "train_loss": 5.149731922440413,
-        "perplexity": 172.3852714991249,
-        "total_tokens": 5337660.0
+        "train_loss": 5.086650198552666,
+        "perplexity": 161.84679834416724,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1168.3474838733673,
+        "elapsed_time": 5843.429780006409
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     },
     {
       "epoch": 6,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763599889.799584,
+      "timestamp": 1763655525.347911,
       "metrics": {
-        "train_loss": 4.919685317248833,
-        "perplexity": 136.9595076098808,
-        "total_tokens": 5337660.0
+        "train_loss": 2.1208596478511645,
+        "perplexity": 8.338302411341113,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1168.53302526474,
+        "elapsed_time": 7011.991562843323
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     },
     {
       "epoch": 7,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763600908.4785576,
+      "timestamp": 1763656696.602588,
       "metrics": {
-        "train_loss": 4.61983042519267,
-        "perplexity": 101.47682275778128,
-        "total_tokens": 5337660.0
+        "train_loss": 0.7554983438515082,
+        "perplexity": 2.1286720697127897,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1171.2295064926147,
+        "elapsed_time": 8183.246211767197
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     },
     {
       "epoch": 8,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763601920.8480155,
+      "timestamp": 1763657871.1382978,
       "metrics": {
-        "train_loss": 0.7081137059211005,
-        "perplexity": 2.0301581692824624,
-        "total_tokens": 5337660.0
+        "train_loss": 0.645182143624236,
+        "perplexity": 1.9063342242758994,
+        "total_tokens": 5337660.0,
+        "epoch_time": 1174.513928413391,
+        "elapsed_time": 9357.781753778458
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
-      "dataset_size": 10466
-    },
-    {
-      "epoch": 9,
-      "phase": "pretrain",
-      "model_name": "gpt",
-      "timestamp": 1763602932.798815,
-      "metrics": {
-        "train_loss": 0.12012030511367612,
-        "perplexity": 1.1276325033759131,
-        "total_tokens": 5337660.0
-      },
-      "learning_rate": 0.0005,
-      "batch_size": 32,
-      "dataset_size": 10466
-    },
-    {
-      "epoch": 10,
-      "phase": "pretrain",
-      "model_name": "gpt",
-      "timestamp": 1763603944.5953977,
-      "metrics": {
-        "train_loss": 0.06502569102250584,
-        "perplexity": 1.0671864411428862,
-        "total_tokens": 5337660.0
-      },
-      "learning_rate": 0.0005,
-      "batch_size": 32,
-      "dataset_size": 10466
+      "dataset_size": 10466,
+      "total_parameters": 6697474,
+      "model_display_name": "Transformer"
     }
   ],
   "finetune_history": [],
   "best_pretrain": {
-    "epoch": 10,
-    "loss": 0.06502569102250584,
-    "perplexity": 1.0671864411428862
+    "epoch": 8,
+    "loss": 0.645182143624236,
+    "perplexity": 1.9063342242758994
   }
 }

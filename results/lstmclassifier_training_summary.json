@@ -8,68 +8,80 @@
       "epoch": 1,
       "phase": "finetune",
       "model_name": "lstmclassifier",
-      "timestamp": 1763571623.1720726,
+      "timestamp": 1763648398.0888047,
       "metrics": {
-        "train_loss": 0.5050996704136624,
-        "train_acc": 0.74004,
-        "val_loss": 0.3572459901442461,
-        "val_acc": 0.84556,
-        "val_f1": 0.8489850197520241,
-        "val_precision": 0.8305655467972756,
-        "val_recall": 0.86824
+        "train_loss": 0.5115033940547873,
+        "train_acc": 0.73572,
+        "val_loss": 0.3731634808499414,
+        "val_acc": 0.83616,
+        "val_f1": 0.8273041571802007,
+        "val_precision": 0.874576573364236,
+        "val_recall": 0.78488,
+        "epoch_time": 50.88982844352722,
+        "elapsed_time": 50.889830112457275
       },
       "learning_rate": 0.0001,
       "batch_size": 32,
       "train_dataset_size": 25000,
       "val_dataset_size": 25000,
-      "is_best_epoch": "True"
+      "is_best_epoch": "True",
+      "total_parameters": 6632322,
+      "model_display_name": "LSTM with Attention"
     },
     {
       "epoch": 2,
       "phase": "finetune",
       "model_name": "lstmclassifier",
-      "timestamp": 1763571854.3549738,
+      "timestamp": 1763648448.7486863,
       "metrics": {
-        "train_loss": 0.28748698089548086,
-        "train_acc": 0.88132,
-        "val_loss": 0.32113873296896056,
-        "val_acc": 0.86404,
-        "val_f1": 0.8611576324496548,
-        "val_precision": 0.8798096986895918,
-        "val_recall": 0.84328
+        "train_loss": 0.2863487517199172,
+        "train_acc": 0.88076,
+        "val_loss": 0.30904907312796775,
+        "val_acc": 0.87196,
+        "val_f1": 0.8719241387588524,
+        "val_precision": 0.8721684143120148,
+        "val_recall": 0.87168,
+        "epoch_time": 50.520851373672485,
+        "elapsed_time": 101.54970598220825
       },
       "learning_rate": 0.0001,
       "batch_size": 32,
       "train_dataset_size": 25000,
       "val_dataset_size": 25000,
-      "is_best_epoch": "True"
+      "is_best_epoch": "True",
+      "total_parameters": 6632322,
+      "model_display_name": "LSTM with Attention"
     },
     {
       "epoch": 3,
       "phase": "finetune",
       "model_name": "lstmclassifier",
-      "timestamp": 1763572085.4668767,
+      "timestamp": 1763648499.4406843,
       "metrics": {
-        "train_loss": 0.20495570838318,
-        "train_acc": 0.91812,
-        "val_loss": 0.32752701024646347,
-        "val_acc": 0.867,
-        "val_f1": 0.869684499314129,
-        "val_precision": 0.8524779101037264,
-        "val_recall": 0.8876
+        "train_loss": 0.19061244001416752,
+        "train_acc": 0.92788,
+        "val_loss": 0.3557943537309671,
+        "val_acc": 0.86152,
+        "val_f1": 0.8710038005812654,
+        "val_precision": 0.8151764541777096,
+        "val_recall": 0.93504,
+        "epoch_time": 50.58117437362671,
+        "elapsed_time": 152.24169874191284
       },
       "learning_rate": 0.0001,
       "batch_size": 32,
       "train_dataset_size": 25000,
       "val_dataset_size": 25000,
-      "is_best_epoch": "True"
+      "is_best_epoch": "False",
+      "total_parameters": 6632322,
+      "model_display_name": "LSTM with Attention"
     }
   ],
   "best_finetune": {
-    "epoch": 3,
-    "accuracy": 0.867,
-    "f1_score": 0.869684499314129,
-    "precision": 0.8524779101037264,
-    "recall": 0.8876
+    "epoch": 2,
+    "accuracy": 0.87196,
+    "f1_score": 0.8719241387588524,
+    "precision": 0.8721684143120148,
+    "recall": 0.87168
   }
 }

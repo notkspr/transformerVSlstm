@@ -31,6 +31,24 @@ class ModelEvaluator:
         self.evaluation_dir = Path("evaluation")
         self.evaluation_dir.mkdir(exist_ok=True)
         
+        # Load evaluation datasets
+        self._load_evaluation_data()
+    
+    def count_parameters(self, model) -> int:
+        """Count total number of parameters in the model"""
+        return sum(p.numel() for p in model.parameters())
+    
+    def get_model_display_name(self, model_name: str) -> str:
+        """Get the display name for the model (LSTM -> LSTM with Attention, GPT -> Transformer)"""
+        if 'lstm' in model_name.lower():
+            return 'LSTM with Attention'
+        elif 'gpt' in model_name.lower():
+            return 'Transformer'
+        else:
+            return model_name.upper()
+    
+    def _load_evaluation_data(self):
+        """Load evaluation datasets"""
         # Load IMDB test data for fine-tuning evaluation
         print("Loading IMDB data for fine-tuning evaluation...")
         _, self.test_imdb = load_imdb_data()
@@ -39,7 +57,7 @@ class ModelEvaluator:
         
         # Load Wikipedia data for pre-training evaluation
         print("Loading Wikipedia data for pre-training evaluation...")
-        wiki_texts = load_wikipedia_data(1000)  # Small subset for evaluation
+        wiki_texts = load_wikipedia_data(200)  # Small subset for evaluation
         self.wiki_dataset = WikiTextDataset(wiki_texts, self.tokenizer, self.config.MAX_LEN - 1)
         self.wiki_loader = DataLoader(self.wiki_dataset, batch_size=self.config.BATCH_SIZE, shuffle=False)
         
@@ -138,6 +156,8 @@ class ModelEvaluator:
         total_loss = 0.0
         total_tokens = 0
         criterion = nn.CrossEntropyLoss(ignore_index=0)  # Ignore padding tokens
+        total_params = self.count_parameters(model)
+        display_name = self.get_model_display_name(model_name)
         
         with torch.no_grad():
             for batch in self.wiki_loader:
@@ -164,9 +184,11 @@ class ModelEvaluator:
         
         return {
             'model_name': model_name,
+            'display_name': display_name,
             'language_modeling_loss': avg_loss,
             'perplexity': perplexity,
-            'total_tokens': total_tokens
+            'total_tokens': total_tokens,
+            'total_parameters': total_params
         }
     
     def evaluate_model(self, model: torch.nn.Module, model_name: str) -> Dict:
@@ -177,6 +199,8 @@ class ModelEvaluator:
         all_labels = []
         all_logits = []
         total_loss = 0.0
+        total_params = self.count_parameters(model)
+        display_name = self.get_model_display_name(model_name)
         
         with torch.no_grad():
             for batch in self.test_loader:
@@ -202,11 +226,13 @@ class ModelEvaluator:
         
         return {
             'model_name': model_name,
+            'display_name': display_name,
             'accuracy': accuracy,
             'f1_score': f1,
             'precision': precision,
             'recall': recall,
             'loss': avg_loss,
+            'total_parameters': total_params,
             'predictions': all_predictions,
             'labels': all_labels,
             'logits': all_logits
@@ -309,17 +335,23 @@ class ModelEvaluator:
         lstm_values = [r[metric] for r in results['lstm']]
         gpt_values = [r[metric] for r in results['gpt']]
         
+        # Get parameter counts for labels
+        lstm_params = results['lstm'][0]['total_parameters'] if results['lstm'] else 0
+        gpt_params = results['gpt'][0]['total_parameters'] if results['gpt'] else 0
+        
         # Use sequential numbering for x-axis
         lstm_epochs = list(range(1, len(lstm_values) + 1))
         gpt_epochs = list(range(1, len(gpt_values) + 1))
         
-        # Plot lines
-        plt.plot(lstm_epochs, lstm_values, 'o-', label='LSTM', linewidth=2, markersize=8, color='blue')
-        plt.plot(gpt_epochs, gpt_values, 's-', label='GPT', linewidth=2, markersize=8, color='red')
+        # Plot lines with parameter counts in labels
+        plt.plot(lstm_epochs, lstm_values, 'o-', label=f'LSTM with Attention ({lstm_params:,} params)', 
+                linewidth=2, markersize=8, color='blue')
+        plt.plot(gpt_epochs, gpt_values, 's-', label=f'Transformer ({gpt_params:,} params)', 
+                linewidth=2, markersize=8, color='red')
         
         plt.xlabel('Pre-training Epoch', fontsize=12)
         plt.ylabel(title, fontsize=12)
-        plt.title(f'Pre-training {title} Comparison: LSTM vs GPT', fontsize=14, fontweight='bold')
+        plt.title(f'Pre-training {title} Comparison: LSTM with Attention vs Transformer', fontsize=14, fontweight='bold')
         plt.legend(fontsize=12)
         plt.grid(True, alpha=0.3)
         
@@ -341,17 +373,23 @@ class ModelEvaluator:
         lstm_values = [r[metric] for r in results['lstm']]
         gpt_values = [r[metric] for r in results['gpt']]
         
+        # Get parameter counts for labels
+        lstm_params = results['lstm'][0]['total_parameters'] if results['lstm'] else 0
+        gpt_params = results['gpt'][0]['total_parameters'] if results['gpt'] else 0
+        
         # Use sequential numbering for x-axis
         lstm_epochs = list(range(1, len(lstm_values) + 1))
         gpt_epochs = list(range(1, len(gpt_values) + 1))
         
-        # Plot lines
-        plt.plot(lstm_epochs, lstm_values, 'o-', label='LSTM', linewidth=2, markersize=8, color='blue')
-        plt.plot(gpt_epochs, gpt_values, 's-', label='GPT', linewidth=2, markersize=8, color='red')
+        # Plot lines with parameter counts in labels
+        plt.plot(lstm_epochs, lstm_values, 'o-', label=f'LSTM with Attention ({lstm_params:,} params)', 
+                linewidth=2, markersize=8, color='blue')
+        plt.plot(gpt_epochs, gpt_values, 's-', label=f'Transformer ({gpt_params:,} params)', 
+                linewidth=2, markersize=8, color='red')
         
         plt.xlabel('Fine-tuning Checkpoint', fontsize=12)
         plt.ylabel(title, fontsize=12)
-        plt.title(f'Fine-tuning {title} Comparison: LSTM vs GPT', fontsize=14, fontweight='bold')
+        plt.title(f'Fine-tuning {title} Comparison: LSTM with Attention vs Transformer', fontsize=14, fontweight='bold')
         plt.legend(fontsize=12)
         plt.grid(True, alpha=0.3)
         
@@ -376,8 +414,8 @@ class ModelEvaluator:
         best_gpt = max(finetuned_results['gpt'], key=lambda x: x['f1_score']) if finetuned_results['gpt'] else None
         
         models_data = [
-            (best_lstm, 'LSTM', 0),
-            (best_gpt, 'GPT', 1)
+            (best_lstm, 'LSTM with Attention', 0),
+            (best_gpt, 'Transformer', 1)
         ]
         
         for model_data, model_name, idx in models_data:
@@ -388,7 +426,8 @@ class ModelEvaluator:
             
             # Create heatmap using matplotlib
             im = axes[idx].imshow(cm, cmap='Blues', aspect='auto')
-            axes[idx].set_title(f'{model_name} Confusion Matrix\n(F1: {model_data["f1_score"]:.3f})')
+            param_count = model_data.get('total_parameters', 0)
+            axes[idx].set_title(f'{model_name} Confusion Matrix\n(F1: {model_data["f1_score"]:.3f}, {param_count:,} params)')
             axes[idx].set_xlabel('Predicted')
             axes[idx].set_ylabel('Actual')
             axes[idx].set_xticks([0, 1])
@@ -423,8 +462,11 @@ class ModelEvaluator:
                 lstm_epochs = list(range(1, len(lstm_loss) + 1))
                 gpt_epochs = list(range(1, len(gpt_loss) + 1))
                 
-                axes[0].plot(lstm_epochs, lstm_loss, 'o-', label='LSTM', linewidth=2, markersize=6)
-                axes[0].plot(gpt_epochs, gpt_loss, 's-', label='GPT', linewidth=2, markersize=6)
+                lstm_params = pretrained_results['lstm'][0].get('total_parameters', 0) if pretrained_results['lstm'] else 0
+                gpt_params = pretrained_results['gpt'][0].get('total_parameters', 0) if pretrained_results['gpt'] else 0
+                
+                axes[0].plot(lstm_epochs, lstm_loss, 'o-', label=f'LSTM with Attention ({lstm_params:,} params)', linewidth=2, markersize=6)
+                axes[0].plot(gpt_epochs, gpt_loss, 's-', label=f'Transformer ({gpt_params:,} params)', linewidth=2, markersize=6)
                 axes[0].set_xlabel('Pre-training Epoch')
                 axes[0].set_ylabel('Language Modeling Loss')
                 axes[0].set_title('Pre-training Loss Comparison')
@@ -435,8 +477,8 @@ class ModelEvaluator:
                 lstm_ppl = [r['perplexity'] for r in pretrained_results['lstm']]
                 gpt_ppl = [r['perplexity'] for r in pretrained_results['gpt']]
                 
-                axes[1].plot(lstm_epochs, lstm_ppl, 'o-', label='LSTM', linewidth=2, markersize=6)
-                axes[1].plot(gpt_epochs, gpt_ppl, 's-', label='GPT', linewidth=2, markersize=6)
+                axes[1].plot(lstm_epochs, lstm_ppl, 'o-', label=f'LSTM with Attention ({lstm_params:,} params)', linewidth=2, markersize=6)
+                axes[1].plot(gpt_epochs, gpt_ppl, 's-', label=f'Transformer ({gpt_params:,} params)', linewidth=2, markersize=6)
                 axes[1].set_xlabel('Pre-training Epoch')
                 axes[1].set_ylabel('Perplexity')
                 axes[1].set_title('Pre-training Perplexity Comparison')
@@ -464,8 +506,11 @@ class ModelEvaluator:
                     lstm_epochs = list(range(1, len(lstm_values) + 1))
                     gpt_epochs = list(range(1, len(gpt_values) + 1))
                     
-                    axes[i].plot(lstm_epochs, lstm_values, 'o-', label='LSTM', linewidth=2, markersize=6)
-                    axes[i].plot(gpt_epochs, gpt_values, 's-', label='GPT', linewidth=2, markersize=6)
+                    lstm_params = finetuned_results['lstm'][0].get('total_parameters', 0) if finetuned_results['lstm'] else 0
+                    gpt_params = finetuned_results['gpt'][0].get('total_parameters', 0) if finetuned_results['gpt'] else 0
+                    
+                    axes[i].plot(lstm_epochs, lstm_values, 'o-', label=f'LSTM with Attention ({lstm_params:,} params)', linewidth=2, markersize=6)
+                    axes[i].plot(gpt_epochs, gpt_values, 's-', label=f'Transformer ({gpt_params:,} params)', linewidth=2, markersize=6)
                     
                     axes[i].set_xlabel('Fine-tuning Checkpoint')
                     axes[i].set_ylabel(name)
@@ -481,8 +526,11 @@ class ModelEvaluator:
                 best_lstm = max(finetuned_results['lstm'], key=lambda x: x['f1_score'])
                 best_gpt = max(finetuned_results['gpt'], key=lambda x: x['f1_score'])
                 
+                lstm_params = best_lstm.get('total_parameters', 0)
+                gpt_params = best_gpt.get('total_parameters', 0)
+                
                 table_data = [
-                    ['Metric', 'LSTM (Best)', 'GPT (Best)'],
+                    ['Metric', f'LSTM with Attention ({lstm_params:,})', f'Transformer ({gpt_params:,})'],
                     ['Accuracy', f"{best_lstm['accuracy']:.3f}", f"{best_gpt['accuracy']:.3f}"],
                     ['F1 Score', f"{best_lstm['f1_score']:.3f}", f"{best_gpt['f1_score']:.3f}"],
                     ['Precision', f"{best_lstm['precision']:.3f}", f"{best_gpt['precision']:.3f}"],
@@ -525,9 +573,13 @@ class ModelEvaluator:
         print(f"\n{'='*60}")
         print("INTERACTIVE SENTIMENT ANALYSIS")
         print(f"{'='*60}")
-        print("Using best models:")
-        print(f"  LSTM: {best_lstm_result['model_name']} (F1: {best_lstm_result['f1_score']:.3f})")
-        print(f"  GPT:  {best_gpt_result['model_name']} (F1: {best_gpt_result['f1_score']:.3f})")
+        print(f"Using best models:")
+        lstm_display = best_lstm_result.get('display_name', 'LSTM with Attention')
+        gpt_display = best_gpt_result.get('display_name', 'Transformer')
+        lstm_params = best_lstm_result.get('total_parameters', 0)
+        gpt_params = best_gpt_result.get('total_parameters', 0)
+        print(f"  {lstm_display}: {best_lstm_result['model_name']} (F1: {best_lstm_result['f1_score']:.3f}, {lstm_params:,} params)")
+        print(f"  {gpt_display}: {best_gpt_result['model_name']} (F1: {best_gpt_result['f1_score']:.3f}, {gpt_params:,} params)")
         print("Enter text to analyze sentiment (type 'quit' to exit)")
         print("-" * 60)
         
@@ -577,14 +629,14 @@ class ModelEvaluator:
                 
                 labels = ['Negative', 'Positive']
                 
-                print(f"LSTM Prediction:  {labels[lstm_pred]} (confidence: {lstm_confidence:.3f})")
-                print(f"GPT Prediction:   {labels[gpt_pred]} (confidence: {gpt_confidence:.3f})")
+                print(f"LSTM with Attention Prediction:  {labels[lstm_pred]} (confidence: {lstm_confidence:.3f})")
+                print(f"Transformer Prediction:          {labels[gpt_pred]} (confidence: {gpt_confidence:.3f})")
                 
                 if lstm_pred == gpt_pred:
                     agreement_count += 1
                     print(f"✓ Both models agree: {labels[lstm_pred]}")
                 else:
-                    print(f"✗ Models disagree - LSTM: {labels[lstm_pred]}, GPT: {labels[gpt_pred]}")
+                    print(f"✗ Models disagree - LSTM with Attention: {labels[lstm_pred]}, Transformer: {labels[gpt_pred]}")
         
         print(f"\nSession Summary:")
         print(f"Total predictions: {total_predictions}")
@@ -605,9 +657,11 @@ class ModelEvaluator:
             for result in results['pretrained'][model_type]:
                 json_result = {
                     'model_name': result['model_name'],
+                    'display_name': result.get('display_name', result['model_name']),
                     'language_modeling_loss': float(result['language_modeling_loss']),
                     'perplexity': float(result['perplexity']),
                     'total_tokens': int(result['total_tokens']),
+                    'total_parameters': int(result.get('total_parameters', 0)),
                     'checkpoint_path': result['checkpoint_path']
                 }
                 json_results['pretrained'][model_type].append(json_result)
@@ -617,11 +671,13 @@ class ModelEvaluator:
             for result in results['finetuned'][model_type]:
                 json_result = {
                     'model_name': result['model_name'],
+                    'display_name': result.get('display_name', result['model_name']),
                     'accuracy': float(result['accuracy']),
                     'f1_score': float(result['f1_score']),
                     'precision': float(result['precision']),
                     'recall': float(result['recall']),
                     'loss': float(result['loss']),
+                    'total_parameters': int(result.get('total_parameters', 0)),
                     'checkpoint_path': result['checkpoint_path']
                 }
                 json_results['finetuned'][model_type].append(json_result)
@@ -684,7 +740,9 @@ class ModelEvaluator:
         for model_type in ['lstm', 'gpt']:
             if pretrained_results[model_type]:
                 best_model = min(pretrained_results[model_type], key=lambda x: x['language_modeling_loss'])
-                print(f"{model_type.upper()} Best Pre-trained Model:")
+                display_name = best_model.get('display_name', model_type.upper())
+                param_count = best_model.get('total_parameters', 0)
+                print(f"{display_name} Best Pre-trained Model ({param_count:,} params):")
                 print(f"  Language Modeling Loss: {best_model['language_modeling_loss']:.4f}")
                 print(f"  Perplexity: {best_model['perplexity']:.2f}")
                 print()
@@ -695,7 +753,9 @@ class ModelEvaluator:
         for model_type in ['lstm', 'gpt']:
             if finetuned_results[model_type]:
                 best_model = max(finetuned_results[model_type], key=lambda x: x['f1_score'])
-                print(f"{model_type.upper()} Best Fine-tuned Model:")
+                display_name = best_model.get('display_name', model_type.upper())
+                param_count = best_model.get('total_parameters', 0)
+                print(f"{display_name} Best Fine-tuned Model ({param_count:,} params):")
                 print(f"  Accuracy: {best_model['accuracy']:.3f}")
                 print(f"  F1 Score: {best_model['f1_score']:.3f}")
                 print(f"  Precision: {best_model['precision']:.3f}")

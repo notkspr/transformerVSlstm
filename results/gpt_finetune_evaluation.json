@@ -3,60 +3,72 @@
     "epoch": 1,
     "phase": "finetune",
     "model_name": "gpt",
-    "timestamp": 1763631299.0085964,
+    "timestamp": 1763658044.363107,
     "metrics": {
-      "train_loss": 0.4455413087687986,
-      "train_acc": 0.78532,
-      "val_loss": 0.3280664152415741,
-      "val_acc": 0.86092,
-      "val_f1": 0.8602548129094489,
-      "val_precision": 0.8643889831192957,
-      "val_recall": 0.85616
+      "train_loss": 0.4899050098322237,
+      "train_acc": 0.7596,
+      "val_loss": 0.3676795704323617,
+      "val_acc": 0.83944,
+      "val_f1": 0.8422541853336477,
+      "val_precision": 0.827746021937278,
+      "val_recall": 0.85728,
+      "epoch_time": 150.7900218963623,
+      "elapsed_time": 150.79002499580383
     },
     "learning_rate": 0.0001,
     "batch_size": 32,
     "train_dataset_size": 25000,
     "val_dataset_size": 25000,
-    "is_best_epoch": "True"
+    "is_best_epoch": "True",
+    "total_parameters": 6697474,
+    "model_display_name": "Transformer"
   },
   {
     "epoch": 2,
     "phase": "finetune",
     "model_name": "gpt",
-    "timestamp": 1763631635.0473754,
+    "timestamp": 1763658196.5253334,
     "metrics": {
-      "train_loss": 0.27149208689399085,
-      "train_acc": 0.89008,
-      "val_loss": 0.3231929497688513,
-      "val_acc": 0.86992,
-      "val_f1": 0.8751535626535627,
-      "val_precision": 0.8413049896663715,
-      "val_recall": 0.91184
+      "train_loss": 0.28355880940090056,
+      "train_acc": 0.8848,
+      "val_loss": 0.3389692647082498,
+      "val_acc": 0.85484,
+      "val_f1": 0.8545316070068545,
+      "val_precision": 0.856350927934442,
+      "val_recall": 0.85272,
+      "epoch_time": 152.03269290924072,
+      "elapsed_time": 302.9522325992584
     },
     "learning_rate": 0.0001,
     "batch_size": 32,
     "train_dataset_size": 25000,
     "val_dataset_size": 25000,
-    "is_best_epoch": "True"
+    "is_best_epoch": "True",
+    "total_parameters": 6697474,
+    "model_display_name": "Transformer"
   },
   {
     "epoch": 3,
     "phase": "finetune",
     "model_name": "gpt",
-    "timestamp": 1763631927.4739711,
+    "timestamp": 1763658347.3129418,
     "metrics": {
-      "train_loss": 0.18958830296316798,
-      "train_acc": 0.92736,
-      "val_loss": 0.3579624804603817,
-      "val_acc": 0.8632,
-      "val_f1": 0.8562904445751743,
-      "val_precision": 0.901841033811294,
-      "val_recall": 0.81512
+      "train_loss": 0.19883558164110116,
+      "train_acc": 0.92556,
+      "val_loss": 0.3614988687764996,
+      "val_acc": 0.85364,
+      "val_f1": 0.8570982230033196,
+      "val_precision": 0.8373140022892026,
+      "val_recall": 0.87784,
+      "epoch_time": 150.6536304950714,
+      "elapsed_time": 453.7398405075073
     },
     "learning_rate": 0.0001,
     "batch_size": 32,
     "train_dataset_size": 25000,
     "val_dataset_size": 25000,
-    "is_best_epoch": "False"
+    "is_best_epoch": "False",
+    "total_parameters": 6697474,
+    "model_display_name": "Transformer"
   }
 ]

@@ -13,6 +13,7 @@ import json
 import time
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+from datetime import datetime
 
 import torch
 import torch.nn as nn
@@ -32,15 +33,15 @@ from bpe import BPETokenizer
 class Config:
     # Model hyperparameters
     BATCH_SIZE = 32
-    PRETRAIN_EPOCHS = 10
+    PRETRAIN_EPOCHS = 8
     FINETUNE_EPOCHS = 3
     PRETRAIN_LR = 5e-4
     FINETUNE_LR = 1e-4
     MAX_LEN = 512
     EMBEDDING_DIM = 128
     HIDDEN_DIM = 256
-    NUM_LAYERS = 2
-    NUM_HEADS = 4
+    NUM_LAYERS = 1
+    NUM_HEADS = 1
     DROPOUT = 0.1
     
     # Data configuration
@@ -145,10 +146,33 @@ class Trainer:
         }
         self.model_name = type(self.model).__name__.lower()
         
+        # Get model parameter count and display name
+        self.total_parameters = self.count_parameters()
+        self.display_name = self.get_model_display_name()
+        
+        # Initialize timing tracking
+        self.training_start_time = None
+        self.epoch_times = []
+        
+        print(f"Initialized {self.display_name} with {self.total_parameters:,} parameters")
+    
+    def count_parameters(self) -> int:
+        """Count total number of parameters in the model"""
+        return sum(p.numel() for p in self.model.parameters())
+    
+    def get_model_display_name(self) -> str:
+        """Get the display name for the model (LSTM -> LSTM with Attention, GPT -> Transformer)"""
+        if 'lstm' in self.model_name:
+            return 'LSTM with Attention'
+        elif 'gpt' in self.model_name:
+            return 'Transformer'
+        else:
+            return self.model_name.upper()
+        
     def pretrain(self, wiki_texts: List[str], epochs: int, lr: float) -> Dict[str, List[float]]:
         """Pre-train model on Wikipedia text using language modeling objective"""
         print(f"\n{'='*60}")
-        print(f"PRE-TRAINING {type(self.model).__name__} MODEL")
+        print(f"PRE-TRAINING {self.display_name} MODEL")
         print(f"{'='*60}")
         
         # Create dataset and dataloader
@@ -160,10 +184,14 @@ class Trainer:
         criterion = nn.CrossEntropyLoss(ignore_index=0)  # Ignore padding tokens
         
         # Training metrics
-        metrics = {'train_loss': [], 'perplexity': []}
+        metrics = {'train_loss': [], 'perplexity': [], 'epoch_times': []}
+        
+        # Start timing
+        self.training_start_time = time.time()
         
         self.model.train()
         for epoch in range(epochs):
+            epoch_start_time = time.time()
             epoch_loss = 0
             epoch_tokens = 0
             
@@ -200,25 +228,33 @@ class Trainer:
                         'ppl': f"{torch.exp(loss):.2f}"
                     })
             
-            # Calculate epoch metrics
+            # Calculate epoch metrics and timing
+            epoch_time = time.time() - epoch_start_time
+            elapsed_time = time.time() - self.training_start_time
+            
             avg_loss = epoch_loss / len(dataloader)
             perplexity = np.exp(avg_loss)
             
             metrics['train_loss'].append(avg_loss)
             metrics['perplexity'].append(perplexity)
+            metrics['epoch_times'].append(elapsed_time)
             
-            print(f"Epoch {epoch+1}: Loss={avg_loss:.4f}, Perplexity={perplexity:.2f}")
+            print(f"Epoch {epoch+1}: Loss={avg_loss:.4f}, Perplexity={perplexity:.2f}, Time={epoch_time:.1f}s (Total: {elapsed_time:.1f}s)")
             
             # Save evaluation data
             epoch_metrics = {
                 'train_loss': avg_loss,
                 'perplexity': perplexity,
-                'total_tokens': epoch_tokens
+                'total_tokens': epoch_tokens,
+                'epoch_time': epoch_time,
+                'elapsed_time': elapsed_time
             }
             additional_data = {
                 'learning_rate': lr,
                 'batch_size': self.config.BATCH_SIZE,
-                'dataset_size': len(dataloader.dataset)
+                'dataset_size': len(dataloader.dataset),
+                'total_parameters': self.total_parameters,
+                'model_display_name': self.display_name
             }
             self.save_evaluation_data('pretrain', epoch+1, epoch_metrics, additional_data)
             
@@ -237,19 +273,25 @@ class Trainer:
     def finetune(self, train_loader, val_loader, epochs: int, lr: float) -> Dict[str, List[float]]:
         """Fine-tune model on IMDB sentiment classification"""
         print(f"\n{'='*60}")
-        print(f"FINE-TUNING {type(self.model).__name__} MODEL")
+        print(f"FINE-TUNING {self.display_name} MODEL")
         print(f"{'='*60}")
         
         optimizer = Adam(self.model.parameters(), lr=lr)
         
         metrics = {
             'train_loss': [], 'train_acc': [],
-            'val_loss': [], 'val_acc': [], 'val_f1': []
+            'val_loss': [], 'val_acc': [], 'val_f1': [],
+            'epoch_times': []
         }
+        
+        # Start timing
+        self.training_start_time = time.time()
         
         best_val_acc = 0
         
         for epoch in range(epochs):
+            epoch_start_time = time.time()
+            
             # Training
             self.model.train()
             train_loss = 0
@@ -280,6 +322,10 @@ class Trainer:
             # Validation
             val_metrics = self.evaluate(val_loader)
             
+            # Calculate timing
+            epoch_time = time.time() - epoch_start_time
+            elapsed_time = time.time() - self.training_start_time
+            
             # Store metrics
             train_loss_avg = train_loss / len(train_loader)
             train_acc_avg = train_correct / train_total
@@ -289,10 +335,12 @@ class Trainer:
             metrics['val_loss'].append(val_metrics['loss'])
             metrics['val_acc'].append(val_metrics['accuracy'])
             metrics['val_f1'].append(val_metrics['f1'])
+            metrics['epoch_times'].append(elapsed_time)
             
             print(f"Epoch {epoch+1}:")
             print(f"  Train Loss: {train_loss_avg:.4f}, Train Acc: {train_acc_avg:.4f}")
             print(f"  Val Loss: {val_metrics['loss']:.4f}, Val Acc: {val_metrics['accuracy']:.4f}, Val F1: {val_metrics['f1']:.4f}")
+            print(f"  Time: {epoch_time:.1f}s (Total: {elapsed_time:.1f}s)")
             
             # Save evaluation data
             epoch_metrics = {
@@ -302,14 +350,18 @@ class Trainer:
                 'val_acc': val_metrics['accuracy'],
                 'val_f1': val_metrics['f1'],
                 'val_precision': val_metrics['precision'],
-                'val_recall': val_metrics['recall']
+                'val_recall': val_metrics['recall'],
+                'epoch_time': epoch_time,
+                'elapsed_time': elapsed_time
             }
             additional_data = {
                 'learning_rate': lr,
                 'batch_size': self.config.BATCH_SIZE,
                 'train_dataset_size': len(train_loader.dataset),
                 'val_dataset_size': len(val_loader.dataset),
-                'is_best_epoch': val_metrics['accuracy'] > best_val_acc
+                'is_best_epoch': val_metrics['accuracy'] > best_val_acc,
+                'total_parameters': self.total_parameters,
+                'model_display_name': self.display_name
             }
             self.save_evaluation_data('finetune', epoch+1, epoch_metrics, additional_data)
             
@@ -553,71 +605,119 @@ def load_imdb_data():
     dataset = load_dataset("imdb")
     return dataset["train"], dataset["test"]
 
-def plot_metrics(metrics: Dict[str, List[float]], model_name: str, phase: str):
-    """Plot training metrics"""
+def plot_metrics(metrics: Dict[str, List[float]], model_name: str, phase: str, total_params: int = None):
+    """Plot training metrics including time-based plots"""
+    # Convert model name if needed
+    display_name = model_name
+    if 'lstm' in model_name.lower():
+        display_name = 'LSTM with Attention'
+    elif 'gpt' in model_name.lower():
+        display_name = 'Transformer'
+    
     if phase == "pretrain":
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+        # Create 2x2 subplot for pretrain: Loss vs Epochs, Perplexity vs Epochs, Loss vs Time, Perplexity vs Time
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
         
         epochs = range(1, len(metrics['train_loss']) + 1)
+        times = metrics.get('epoch_times', epochs)  # Use times if available, else epochs
         
-        ax1.plot(epochs, metrics['train_loss'], 'b-', label='Training Loss')
+        # Loss vs Epochs (original)
+        ax1.plot(epochs, metrics['train_loss'], 'b-', label='Training Loss', linewidth=2, marker='o')
         ax1.set_xlabel('Epoch')
         ax1.set_ylabel('Loss')
-        ax1.set_title(f'{model_name} Pre-training Loss')
+        title_suffix = f' ({total_params:,} params)' if total_params else ''
+        ax1.set_title(f'{display_name} Pre-training Loss vs Epochs{title_suffix}')
         ax1.legend()
-        ax1.grid(True)
+        ax1.grid(True, alpha=0.3)
         
-        ax2.plot(epochs, metrics['perplexity'], 'r-', label='Perplexity')
+        # Perplexity vs Epochs (original)
+        ax2.plot(epochs, metrics['perplexity'], 'r-', label='Perplexity', linewidth=2, marker='s')
         ax2.set_xlabel('Epoch')
         ax2.set_ylabel('Perplexity')
-        ax2.set_title(f'{model_name} Pre-training Perplexity')
+        ax2.set_title(f'{display_name} Pre-training Perplexity vs Epochs{title_suffix}')
         ax2.legend()
-        ax2.grid(True)
+        ax2.grid(True, alpha=0.3)
+        
+        # Loss vs Time (new)
+        ax3.plot(times, metrics['train_loss'], 'b-', label='Training Loss', linewidth=2, marker='o')
+        ax3.set_xlabel('Time (seconds)')
+        ax3.set_ylabel('Loss')
+        ax3.set_title(f'{display_name} Pre-training Loss vs Time{title_suffix}')
+        ax3.legend()
+        ax3.grid(True, alpha=0.3)
+        
+        # Perplexity vs Time (new)
+        ax4.plot(times, metrics['perplexity'], 'r-', label='Perplexity', linewidth=2, marker='s')
+        ax4.set_xlabel('Time (seconds)')
+        ax4.set_ylabel('Perplexity')
+        ax4.set_title(f'{display_name} Pre-training Perplexity vs Time{title_suffix}')
+        ax4.legend()
+        ax4.grid(True, alpha=0.3)
         
     else:  # finetune
-        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
+        # Create 2x3 subplot for finetune: Loss vs Epochs, Accuracy vs Epochs, F1 vs Epochs, Loss vs Time, Accuracy vs Time, F1 vs Time
+        fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(2, 3, figsize=(18, 10))
         
         epochs = range(1, len(metrics['train_loss']) + 1)
+        times = metrics.get('epoch_times', epochs)  # Use times if available, else epochs
+        title_suffix = f' ({total_params:,} params)' if total_params else ''
         
-        # Loss plot
-        ax1.plot(epochs, metrics['train_loss'], 'b-', label='Training Loss')
-        ax1.plot(epochs, metrics['val_loss'], 'r-', label='Validation Loss')
+        # Loss vs Epochs (original)
+        ax1.plot(epochs, metrics['train_loss'], 'b-', label='Training Loss', linewidth=2, marker='o')
+        ax1.plot(epochs, metrics['val_loss'], 'r-', label='Validation Loss', linewidth=2, marker='s')
         ax1.set_xlabel('Epoch')
         ax1.set_ylabel('Loss')
-        ax1.set_title(f'{model_name} Fine-tuning Loss')
+        ax1.set_title(f'{display_name} Fine-tuning Loss vs Epochs{title_suffix}')
         ax1.legend()
-        ax1.grid(True)
+        ax1.grid(True, alpha=0.3)
         
-        # Accuracy plot
-        ax2.plot(epochs, metrics['train_acc'], 'b-', label='Training Accuracy')
-        ax2.plot(epochs, metrics['val_acc'], 'r-', label='Validation Accuracy')
+        # Accuracy vs Epochs (original)
+        ax2.plot(epochs, metrics['train_acc'], 'b-', label='Training Accuracy', linewidth=2, marker='o')
+        ax2.plot(epochs, metrics['val_acc'], 'r-', label='Validation Accuracy', linewidth=2, marker='s')
         ax2.set_xlabel('Epoch')
         ax2.set_ylabel('Accuracy')
-        ax2.set_title(f'{model_name} Fine-tuning Accuracy')
+        ax2.set_title(f'{display_name} Fine-tuning Accuracy vs Epochs{title_suffix}')
         ax2.legend()
-        ax2.grid(True)
+        ax2.grid(True, alpha=0.3)
         
-        # F1 Score plot
-        ax3.plot(epochs, metrics['val_f1'], 'g-', label='Validation F1')
+        # F1 Score vs Epochs (original)
+        ax3.plot(epochs, metrics['val_f1'], 'g-', label='Validation F1', linewidth=2, marker='^')
         ax3.set_xlabel('Epoch')
         ax3.set_ylabel('F1 Score')
-        ax3.set_title(f'{model_name} Fine-tuning F1 Score')
+        ax3.set_title(f'{display_name} Fine-tuning F1 vs Epochs{title_suffix}')
         ax3.legend()
-        ax3.grid(True)
+        ax3.grid(True, alpha=0.3)
         
-        # Combined metrics
-        ax4.plot(epochs, metrics['val_acc'], 'r-', label='Validation Accuracy')
-        ax4.plot(epochs, metrics['val_f1'], 'g-', label='Validation F1')
-        ax4.set_xlabel('Epoch')
-        ax4.set_ylabel('Score')
-        ax4.set_title(f'{model_name} Validation Metrics')
+        # Loss vs Time (new)
+        ax4.plot(times, metrics['train_loss'], 'b-', label='Training Loss', linewidth=2, marker='o')
+        ax4.plot(times, metrics['val_loss'], 'r-', label='Validation Loss', linewidth=2, marker='s')
+        ax4.set_xlabel('Time (seconds)')
+        ax4.set_ylabel('Loss')
+        ax4.set_title(f'{display_name} Fine-tuning Loss vs Time{title_suffix}')
         ax4.legend()
-        ax4.grid(True)
+        ax4.grid(True, alpha=0.3)
+        
+        # Accuracy vs Time (new)
+        ax5.plot(times, metrics['train_acc'], 'b-', label='Training Accuracy', linewidth=2, marker='o')
+        ax5.plot(times, metrics['val_acc'], 'r-', label='Validation Accuracy', linewidth=2, marker='s')
+        ax5.set_xlabel('Time (seconds)')
+        ax5.set_ylabel('Accuracy')
+        ax5.set_title(f'{display_name} Fine-tuning Accuracy vs Time{title_suffix}')
+        ax5.legend()
+        ax5.grid(True, alpha=0.3)
+        
+        # F1 Score vs Time (new)
+        ax6.plot(times, metrics['val_f1'], 'g-', label='Validation F1', linewidth=2, marker='^')
+        ax6.set_xlabel('Time (seconds)')
+        ax6.set_ylabel('F1 Score')
+        ax6.set_title(f'{display_name} Fine-tuning F1 vs Time{title_suffix}')
+        ax6.legend()
+        ax6.grid(True, alpha=0.3)
     
     plt.tight_layout()
     filename = f"{model_name}_{phase}_metrics.png"
     plt.savefig(Config.RESULTS_DIR / filename, dpi=300, bbox_inches='tight')
-    plt.show()
+    plt.close()
 
 def main():
     parser = argparse.ArgumentParser(description='Train LSTM and GPT models with pre-training and fine-tuning')
@@ -680,7 +780,7 @@ def main():
             pretrain_metrics = trainer.pretrain(wiki_texts, pretrain_epochs, lr)
             
             # Plot and save results
-            plot_metrics(pretrain_metrics, model_name.upper(), 'pretrain')
+            plot_metrics(pretrain_metrics, model_name.upper(), 'pretrain', trainer.total_parameters)
             
             # Save final checkpoint
             trainer.save_checkpoint(f"{model_name}_pretrained_final.pt", pretrain_epochs)
@@ -726,7 +826,7 @@ def main():
             print(f"  Recall: {final_results['recall']:.4f}")
             
             # Plot metrics
-            plot_metrics(finetune_metrics, model_name.upper(), 'finetune')
+            plot_metrics(finetune_metrics, model_name.upper(), 'finetune', trainer.total_parameters)
             
             # Plot confusion matrix
             plt.figure(figsize=(8, 6))
@@ -734,11 +834,12 @@ def main():
             sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
                        xticklabels=['Negative', 'Positive'],
                        yticklabels=['Negative', 'Positive'])
-            plt.title(f'{model_name.upper()} Confusion Matrix')
+            display_name = 'LSTM with Attention' if 'lstm' in model_name.lower() else 'Transformer' if 'gpt' in model_name.lower() else model_name.upper()
+            plt.title(f'{display_name} Confusion Matrix ({trainer.total_parameters:,} params)')
             plt.ylabel('True Label')
             plt.xlabel('Predicted Label')
             plt.savefig(config.RESULTS_DIR / f"{model_name}_confusion_matrix.png", dpi=300, bbox_inches='tight')
-            plt.show()
+            plt.close()
             
             # Save results (simplified to avoid circular references)
             results_file = config.RESULTS_DIR / f"{model_name}_results.json"
