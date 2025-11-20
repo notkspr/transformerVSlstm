@@ -32,8 +32,8 @@ from bpe import BPETokenizer
 class Config:
     # Model hyperparameters
     BATCH_SIZE = 32
-    PRETRAIN_EPOCHS = 3
-    FINETUNE_EPOCHS = 5
+    PRETRAIN_EPOCHS = 10
+    FINETUNE_EPOCHS = 3
     PRETRAIN_LR = 5e-4
     FINETUNE_LR = 1e-4
     MAX_LEN = 512
@@ -44,7 +44,7 @@ class Config:
     DROPOUT = 0.1
     
     # Data configuration
-    WIKI_SUBSET_SIZE = 50000  # Number of Wikipedia articles for pre-training
+    WIKI_SUBSET_SIZE = 500  # Number of Wikipedia articles for pre-training
     
     # Paths
     CHECKPOINT_DIR = Path("checkpoints")
@@ -138,6 +138,13 @@ class Trainer:
         self.config.LOGS_DIR.mkdir(exist_ok=True)
         self.config.RESULTS_DIR.mkdir(exist_ok=True)
         
+        # Initialize evaluation tracking
+        self.evaluation_history = {
+            'pretrain': [],  # Pre-training evaluation data
+            'finetune': []   # Fine-tuning evaluation data
+        }
+        self.model_name = type(self.model).__name__.lower()
+        
     def pretrain(self, wiki_texts: List[str], epochs: int, lr: float) -> Dict[str, List[float]]:
         """Pre-train model on Wikipedia text using language modeling objective"""
         print(f"\n{'='*60}")
@@ -202,8 +209,28 @@ class Trainer:
             
             print(f"Epoch {epoch+1}: Loss={avg_loss:.4f}, Perplexity={perplexity:.2f}")
             
+            # Save evaluation data
+            epoch_metrics = {
+                'train_loss': avg_loss,
+                'perplexity': perplexity,
+                'total_tokens': epoch_tokens
+            }
+            additional_data = {
+                'learning_rate': lr,
+                'batch_size': self.config.BATCH_SIZE,
+                'dataset_size': len(dataloader.dataset)
+            }
+            self.save_evaluation_data('pretrain', epoch+1, epoch_metrics, additional_data)
+            
             # Save checkpoint
             self.save_checkpoint(f"{type(self.model).__name__.lower()}_pretrained_epoch_{epoch+1}.pt", epoch+1)
+        
+        # Save final pre-training summary
+        summary = self.create_evaluation_summary()
+        summary_file = self.config.RESULTS_DIR / f"{self.model_name}_pretrain_summary.json"
+        with open(summary_file, 'w') as f:
+            json.dump(summary, f, indent=2)
+        print(f"Pre-training summary saved: {summary_file}")
         
         return metrics
     
@@ -254,20 +281,55 @@ class Trainer:
             val_metrics = self.evaluate(val_loader)
             
             # Store metrics
-            metrics['train_loss'].append(train_loss / len(train_loader))
-            metrics['train_acc'].append(train_correct / train_total)
+            train_loss_avg = train_loss / len(train_loader)
+            train_acc_avg = train_correct / train_total
+            
+            metrics['train_loss'].append(train_loss_avg)
+            metrics['train_acc'].append(train_acc_avg)
             metrics['val_loss'].append(val_metrics['loss'])
             metrics['val_acc'].append(val_metrics['accuracy'])
             metrics['val_f1'].append(val_metrics['f1'])
             
             print(f"Epoch {epoch+1}:")
-            print(f"  Train Loss: {metrics['train_loss'][-1]:.4f}, Train Acc: {metrics['train_acc'][-1]:.4f}")
-            print(f"  Val Loss: {metrics['val_loss'][-1]:.4f}, Val Acc: {metrics['val_acc'][-1]:.4f}, Val F1: {metrics['val_f1'][-1]:.4f}")
+            print(f"  Train Loss: {train_loss_avg:.4f}, Train Acc: {train_acc_avg:.4f}")
+            print(f"  Val Loss: {val_metrics['loss']:.4f}, Val Acc: {val_metrics['accuracy']:.4f}, Val F1: {val_metrics['f1']:.4f}")
+            
+            # Save evaluation data
+            epoch_metrics = {
+                'train_loss': train_loss_avg,
+                'train_acc': train_acc_avg,
+                'val_loss': val_metrics['loss'],
+                'val_acc': val_metrics['accuracy'],
+                'val_f1': val_metrics['f1'],
+                'val_precision': val_metrics['precision'],
+                'val_recall': val_metrics['recall']
+            }
+            additional_data = {
+                'learning_rate': lr,
+                'batch_size': self.config.BATCH_SIZE,
+                'train_dataset_size': len(train_loader.dataset),
+                'val_dataset_size': len(val_loader.dataset),
+                'is_best_epoch': val_metrics['accuracy'] > best_val_acc
+            }
+            self.save_evaluation_data('finetune', epoch+1, epoch_metrics, additional_data)
             
             # Save best model
             if val_metrics['accuracy'] > best_val_acc:
                 best_val_acc = val_metrics['accuracy']
                 self.save_checkpoint(f"{type(self.model).__name__.lower()}_finetuned_best.pt", epoch+1, is_best=True)
+            
+            # Save checkpoint for this epoch
+                self.save_checkpoint(f"{type(self.model).__name__.lower()}_finetuned_best.pt", epoch+1, is_best=True)
+            
+            # Save checkpoint for this epoch
+            self.save_checkpoint(f"{type(self.model).__name__.lower()}_finetuned_epoch_{epoch+1}.pt", epoch+1)
+        
+        # Save final training summary
+        summary = self.create_evaluation_summary()
+        summary_file = self.config.RESULTS_DIR / f"{self.model_name}_training_summary.json"
+        with open(summary_file, 'w') as f:
+            json.dump(summary, f, indent=2)
+        print(f"Training summary saved: {summary_file}")
         
         return metrics
     
@@ -324,6 +386,77 @@ class Trainer:
             torch.save(checkpoint, best_path)
         
         print(f"Checkpoint saved: {filepath}")
+    
+    def save_evaluation_data(self, phase: str, epoch: int, metrics: Dict, additional_data: Dict = None):
+        """Save evaluation data for current epoch"""
+        # Convert metrics to ensure JSON serialization
+        serializable_metrics = {}
+        for key, value in metrics.items():
+            if isinstance(value, (int, float, str, bool)):
+                serializable_metrics[key] = float(value) if isinstance(value, (int, float)) else value
+            else:
+                serializable_metrics[key] = str(value)
+        
+        eval_data = {
+            'epoch': epoch,
+            'phase': phase,
+            'model_name': self.model_name,
+            'timestamp': time.time(),
+            'metrics': serializable_metrics
+        }
+        
+        # Add any additional data (e.g., learning rate, batch size, etc.)
+        if additional_data:
+            serializable_additional = {}
+            for key, value in additional_data.items():
+                if isinstance(value, (int, float, str, bool)):
+                    serializable_additional[key] = value
+                else:
+                    serializable_additional[key] = str(value)
+            eval_data.update(serializable_additional)
+        
+        # Store in history
+        self.evaluation_history[phase].append(eval_data)
+        
+        # Save to JSON file immediately (incremental save)
+        eval_file = self.config.RESULTS_DIR / f"{self.model_name}_{phase}_evaluation.json"
+        with open(eval_file, 'w') as f:
+            json.dump(self.evaluation_history[phase], f, indent=2)
+        
+        print(f"Evaluation data saved: {eval_file}")
+    
+    def create_evaluation_summary(self) -> Dict:
+        """Create comprehensive evaluation summary"""
+        summary = {
+            'model_name': self.model_name,
+            'total_pretrain_epochs': len(self.evaluation_history['pretrain']),
+            'total_finetune_epochs': len(self.evaluation_history['finetune']),
+            'pretrain_history': self.evaluation_history['pretrain'],
+            'finetune_history': self.evaluation_history['finetune']
+        }
+        
+        # Calculate best performances
+        if self.evaluation_history['pretrain']:
+            best_pretrain = min(self.evaluation_history['pretrain'], 
+                              key=lambda x: x['metrics']['train_loss'])
+            summary['best_pretrain'] = {
+                'epoch': best_pretrain['epoch'],
+                'loss': best_pretrain['metrics']['train_loss'],
+                'perplexity': best_pretrain['metrics']['perplexity']
+            }
+        
+        if self.evaluation_history['finetune']:
+            best_finetune = max(self.evaluation_history['finetune'], 
+                              key=lambda x: x['metrics']['val_f1'])
+            summary['best_finetune'] = {
+                'epoch': best_finetune['epoch'],
+                'accuracy': best_finetune['metrics']['val_acc'],
+                'f1_score': best_finetune['metrics']['val_f1'],
+                'precision': best_finetune['metrics'].get('val_precision', 0),
+                'recall': best_finetune['metrics'].get('val_recall', 0)
+            }
+        
+        return summary
     
     def load_checkpoint(self, filepath: str, strict: bool = True) -> int:
         """Load model checkpoint"""
@@ -497,15 +630,15 @@ def main():
     parser.add_argument('--finetune_epochs', type=int, help='Number of fine-tuning epochs')
     parser.add_argument('--lr', type=float, help='Learning rate (overrides defaults)')
     parser.add_argument('--load_pretrained', type=str, help='Path to pre-trained model checkpoint')
-    parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
-    parser.add_argument('--wiki_subset_size', type=int, default=50000, help='Wikipedia subset size for pre-training')
+    parser.add_argument('--batch_size', type=int, help='Batch size')
+    parser.add_argument('--wiki_subset_size', type=int, help='Wikipedia subset size for pre-training')
     
     args = parser.parse_args()
     
     # Initialize
     config = Config()
-    config.BATCH_SIZE = args.batch_size
-    config.WIKI_SUBSET_SIZE = args.wiki_subset_size
+    config.BATCH_SIZE = args.batch_size if args.batch_size else config.BATCH_SIZE
+    config.WIKI_SUBSET_SIZE = args.wiki_subset_size if args.wiki_subset_size else config.WIKI_SUBSET_SIZE
     
     # Handle epoch settings
     if args.epochs:

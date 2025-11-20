@@ -1,0 +1,258 @@
+{
+  "pretrained": {
+    "lstm": [
+      {
+        "model_name": "LSTM (Pretrain Epoch 1)",
+        "language_modeling_loss": 6.569698391441538,
+        "perplexity": 713.1547171263833,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_1.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 2)",
+        "language_modeling_loss": 5.912259724560906,
+        "perplexity": 369.5402718462511,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_2.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 3)",
+        "language_modeling_loss": 5.525530029344959,
+        "perplexity": 251.01935038936023,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_3.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 4)",
+        "language_modeling_loss": 1.7384632495271057,
+        "perplexity": 5.688594751457012,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_4.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 5)",
+        "language_modeling_loss": 0.5614474315603241,
+        "perplexity": 1.753208313690267,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_5.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 6)",
+        "language_modeling_loss": 0.250636461264446,
+        "perplexity": 1.2848429092516067,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_6.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 7)",
+        "language_modeling_loss": 0.14965097139112088,
+        "perplexity": 1.16142880009845,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_7.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 8)",
+        "language_modeling_loss": 0.09388516158992503,
+        "perplexity": 1.0984335963061294,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_8.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 9)",
+        "language_modeling_loss": 0.07218772786192032,
+        "perplexity": 1.0748571057514085,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_9.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Epoch 10)",
+        "language_modeling_loss": 0.061198264116249165,
+        "perplexity": 1.0631096697930253,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstmclassifier_pretrained_epoch_10.pt"
+      },
+      {
+        "model_name": "LSTM (Pretrain Final)",
+        "language_modeling_loss": 0.061198264116249165,
+        "perplexity": 1.0631096697930253,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/lstm_pretrained_final.pt"
+      }
+    ],
+    "gpt": [
+      {
+        "model_name": "GPT (Pretrain Epoch 1)",
+        "language_modeling_loss": 6.519970655841988,
+        "perplexity": 678.5584733202317,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_1.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 2)",
+        "language_modeling_loss": 6.000794785764037,
+        "perplexity": 403.74956040820945,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_2.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 3)",
+        "language_modeling_loss": 5.6824666163500615,
+        "perplexity": 293.6729156902314,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_3.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 4)",
+        "language_modeling_loss": 5.442919989193187,
+        "perplexity": 231.1160555167573,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_4.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 5)",
+        "language_modeling_loss": 5.2245286905465,
+        "perplexity": 185.77359303891657,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_5.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 6)",
+        "language_modeling_loss": 5.049484322251392,
+        "perplexity": 155.94202791463405,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_6.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 7)",
+        "language_modeling_loss": 3.377343979202399,
+        "perplexity": 29.292865239979406,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_7.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 8)",
+        "language_modeling_loss": 0.09144776790332393,
+        "perplexity": 1.095759541379495,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_8.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 9)",
+        "language_modeling_loss": 0.046339406658496174,
+        "perplexity": 1.0474298553006332,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_9.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Epoch 10)",
+        "language_modeling_loss": 0.0365509376336797,
+        "perplexity": 1.037227136568081,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_epoch_10.pt"
+      },
+      {
+        "model_name": "GPT (Pretrain Final)",
+        "language_modeling_loss": 0.0365509376336797,
+        "perplexity": 1.037227136568081,
+        "total_tokens": 9699180,
+        "checkpoint_path": "checkpoints/gpt_pretrained_final.pt"
+      }
+    ]
+  },
+  "finetuned": {
+    "lstm": [
+      {
+        "model_name": "LSTM (Finetune Epoch 1)",
+        "accuracy": 0.84556,
+        "f1_score": 0.8489850197520241,
+        "precision": 0.8305655467972756,
+        "recall": 0.86824,
+        "loss": 0.3572459901442461,
+        "checkpoint_path": "checkpoints/lstmclassifier_finetuned_epoch_1.pt"
+      },
+      {
+        "model_name": "LSTM (Finetune Epoch 2)",
+        "accuracy": 0.86404,
+        "f1_score": 0.8611576324496548,
+        "precision": 0.8798096986895918,
+        "recall": 0.84328,
+        "loss": 0.32113873296896056,
+        "checkpoint_path": "checkpoints/lstmclassifier_finetuned_epoch_2.pt"
+      },
+      {
+        "model_name": "LSTM (Finetune Epoch 3)",
+        "accuracy": 0.867,
+        "f1_score": 0.869684499314129,
+        "precision": 0.8524779101037264,
+        "recall": 0.8876,
+        "loss": 0.32752701024646347,
+        "checkpoint_path": "checkpoints/lstmclassifier_finetuned_epoch_3.pt"
+      },
+      {
+        "model_name": "LSTM (Best)",
+        "accuracy": 0.867,
+        "f1_score": 0.869684499314129,
+        "precision": 0.8524779101037264,
+        "recall": 0.8876,
+        "loss": 0.32752701024646347,
+        "checkpoint_path": "checkpoints/lstmclassifier_best.pt"
+      },
+      {
+        "model_name": "LSTM (Finetune Best)",
+        "accuracy": 0.867,
+        "f1_score": 0.869684499314129,
+        "precision": 0.8524779101037264,
+        "recall": 0.8876,
+        "loss": 0.32752701024646347,
+        "checkpoint_path": "checkpoints/lstmclassifier_finetuned_best.pt"
+      }
+    ],
+    "gpt": [
+      {
+        "model_name": "GPT (Finetune Epoch 1)",
+        "accuracy": 0.86092,
+        "f1_score": 0.8602548129094489,
+        "precision": 0.8643889831192957,
+        "recall": 0.85616,
+        "loss": 0.3280664152415741,
+        "checkpoint_path": "checkpoints/gpt_finetuned_epoch_1.pt"
+      },
+      {
+        "model_name": "GPT (Finetune Epoch 2)",
+        "accuracy": 0.86992,
+        "f1_score": 0.8751535626535627,
+        "precision": 0.8413049896663715,
+        "recall": 0.91184,
+        "loss": 0.3231929497688513,
+        "checkpoint_path": "checkpoints/gpt_finetuned_epoch_2.pt"
+      },
+      {
+        "model_name": "GPT (Finetune Epoch 3)",
+        "accuracy": 0.8632,
+        "f1_score": 0.8562904445751743,
+        "precision": 0.901841033811294,
+        "recall": 0.81512,
+        "loss": 0.3579624804603817,
+        "checkpoint_path": "checkpoints/gpt_finetuned_epoch_3.pt"
+      },
+      {
+        "model_name": "GPT (Best)",
+        "accuracy": 0.86992,
+        "f1_score": 0.8751535626535627,
+        "precision": 0.8413049896663715,
+        "recall": 0.91184,
+        "loss": 0.3231929497688513,
+        "checkpoint_path": "checkpoints/gpt_best.pt"
+      },
+      {
+        "model_name": "GPT (Finetune Best)",
+        "accuracy": 0.86992,
+        "f1_score": 0.8751535626535627,
+        "precision": 0.8413049896663715,
+        "recall": 0.91184,
+        "loss": 0.3231929497688513,
+        "checkpoint_path": "checkpoints/gpt_finetuned_best.pt"
+      }
+    ]
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "model_name": "gpt",
+  "total_pretrain_epochs": 10,
+  "total_finetune_epochs": 0,
+  "pretrain_history": [
+    {
+      "epoch": 1,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763594625.0638864,
+      "metrics": {
+        "train_loss": 7.361404772211865,
+        "perplexity": 1574.046186928763,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 2,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763595667.401613,
+      "metrics": {
+        "train_loss": 6.173008997265885,
+        "perplexity": 479.6271337118931,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 3,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763596706.6968765,
+      "metrics": {
+        "train_loss": 5.725564189073516,
+        "perplexity": 306.60620032283026,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 4,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763597745.3606975,
+      "metrics": {
+        "train_loss": 5.411793796027579,
+        "perplexity": 224.03309713954337,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 5,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763598847.5597684,
+      "metrics": {
+        "train_loss": 5.149731922440413,
+        "perplexity": 172.3852714991249,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 6,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763599889.799584,
+      "metrics": {
+        "train_loss": 4.919685317248833,
+        "perplexity": 136.9595076098808,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 7,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763600908.4785576,
+      "metrics": {
+        "train_loss": 4.61983042519267,
+        "perplexity": 101.47682275778128,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 8,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763601920.8480155,
+      "metrics": {
+        "train_loss": 0.7081137059211005,
+        "perplexity": 2.0301581692824624,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 9,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763602932.798815,
+      "metrics": {
+        "train_loss": 0.12012030511367612,
+        "perplexity": 1.1276325033759131,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    },
+    {
+      "epoch": 10,
+      "phase": "pretrain",
+      "model_name": "gpt",
+      "timestamp": 1763603944.5953977,
+      "metrics": {
+        "train_loss": 0.06502569102250584,
+        "perplexity": 1.0671864411428862,
+        "total_tokens": 5337660.0
+      },
+      "learning_rate": 0.0005,
+      "batch_size": 32,
+      "dataset_size": 10466
+    }
+  ],
+  "finetune_history": [],
+  "best_pretrain": {
+    "epoch": 10,
+    "loss": 0.06502569102250584,
+    "perplexity": 1.0671864411428862
+  }
+}

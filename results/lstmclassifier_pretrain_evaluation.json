@@ -1,0 +1,142 @@
+[
+  {
+    "epoch": 1,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763559044.8518414,
+    "metrics": {
+      "train_loss": 7.4968387310097855,
+      "perplexity": 1802.3357309715545,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 2,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763560566.0632586,
+    "metrics": {
+      "train_loss": 6.1396550448929395,
+      "perplexity": 463.89352081668557,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 3,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763561761.3097084,
+    "metrics": {
+      "train_loss": 5.601580177865377,
+      "perplexity": 270.85406704952874,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 4,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763562742.8052614,
+    "metrics": {
+      "train_loss": 4.151186417515685,
+      "perplexity": 63.50930416924979,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 5,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763563723.6797745,
+    "metrics": {
+      "train_loss": 1.5235992931738132,
+      "perplexity": 4.5887116260268925,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 6,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763564705.2081027,
+    "metrics": {
+      "train_loss": 0.9153660255961302,
+      "perplexity": 2.497689302827682,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 7,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763565686.4170182,
+    "metrics": {
+      "train_loss": 0.7037680801458475,
+      "perplexity": 2.0213550031007044,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 8,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763566667.922703,
+    "metrics": {
+      "train_loss": 0.20640659352719057,
+      "perplexity": 1.2292529086760313,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 9,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763567649.314387,
+    "metrics": {
+      "train_loss": 0.13495730563271335,
+      "perplexity": 1.1444879201205915,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  },
+  {
+    "epoch": 10,
+    "phase": "pretrain",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763568629.9787605,
+    "metrics": {
+      "train_loss": 0.11227537196402143,
+      "perplexity": 1.118820910140415,
+      "total_tokens": 5337660.0
+    },
+    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "dataset_size": 10466
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "epoch": 1,
+    "phase": "finetune",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763571623.1720726,
+    "metrics": {
+      "train_loss": 0.5050996704136624,
+      "train_acc": 0.74004,
+      "val_loss": 0.3572459901442461,
+      "val_acc": 0.84556,
+      "val_f1": 0.8489850197520241,
+      "val_precision": 0.8305655467972756,
+      "val_recall": 0.86824
+    },
+    "learning_rate": 0.0001,
+    "batch_size": 32,
+    "train_dataset_size": 25000,
+    "val_dataset_size": 25000,
+    "is_best_epoch": "True"
+  },
+  {
+    "epoch": 2,
+    "phase": "finetune",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763571854.3549738,
+    "metrics": {
+      "train_loss": 0.28748698089548086,
+      "train_acc": 0.88132,
+      "val_loss": 0.32113873296896056,
+      "val_acc": 0.86404,
+      "val_f1": 0.8611576324496548,
+      "val_precision": 0.8798096986895918,
+      "val_recall": 0.84328
+    },
+    "learning_rate": 0.0001,
+    "batch_size": 32,
+    "train_dataset_size": 25000,
+    "val_dataset_size": 25000,
+    "is_best_epoch": "True"
+  },
+  {
+    "epoch": 3,
+    "phase": "finetune",
+    "model_name": "lstmclassifier",
+    "timestamp": 1763572085.4668767,
+    "metrics": {
+      "train_loss": 0.20495570838318,
+      "train_acc": 0.91812,
+      "val_loss": 0.32752701024646347,
+      "val_acc": 0.867,
+      "val_f1": 0.869684499314129,
+      "val_precision": 0.8524779101037264,
+      "val_recall": 0.8876
+    },
+    "learning_rate": 0.0001,
+    "batch_size": 32,
+    "train_dataset_size": 25000,
+    "val_dataset_size": 25000,
+    "is_best_epoch": "True"
+  }
+]
