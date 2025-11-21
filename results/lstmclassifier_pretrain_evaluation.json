@@ -3,144 +3,144 @@
     "epoch": 1,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763685695.5352504,
+    "timestamp": 1763722110.6459455,
     "metrics": {
-      "train_loss": 7.542451320624933,
-      "perplexity": 1886.4486524714123,
+      "train_loss": 7.510952693660085,
+      "perplexity": 1827.9541939027833,
       "total_tokens": 5337660.0,
-      "epoch_time": 894.1724987030029,
-      "elapsed_time": 894.1725568771362
+      "epoch_time": 915.4528253078461,
+      "elapsed_time": 915.4528954029083
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   },
   {
     "epoch": 2,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763686587.3956025,
+    "timestamp": 1763723019.1138783,
     "metrics": {
-      "train_loss": 6.236055960015553,
-      "perplexity": 510.8397601032025,
+      "train_loss": 6.153551955048631,
+      "perplexity": 470.3852101340753,
       "total_tokens": 5337660.0,
-      "epoch_time": 891.8151714801788,
-      "elapsed_time": 1786.032885313034
+      "epoch_time": 908.4289162158966,
+      "elapsed_time": 1823.9207434654236
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   },
   {
     "epoch": 3,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763687484.4667695,
+    "timestamp": 1763723927.1280546,
     "metrics": {
-      "train_loss": 5.706980117937413,
-      "perplexity": 300.9608283588372,
+      "train_loss": 5.601593319962665,
+      "perplexity": 270.857626663419,
       "total_tokens": 5337660.0,
-      "epoch_time": 897.0459673404694,
-      "elapsed_time": 2683.1042850017548
+      "epoch_time": 907.9883010387421,
+      "elapsed_time": 2731.935128927231
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   },
   {
     "epoch": 4,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763688385.7104592,
+    "timestamp": 1763724835.2467868,
     "metrics": {
-      "train_loss": 3.3295271055000586,
-      "perplexity": 27.925132938529806,
+      "train_loss": 3.0438059677438036,
+      "perplexity": 20.98495951909791,
       "total_tokens": 5337660.0,
-      "epoch_time": 901.2189202308655,
-      "elapsed_time": 3584.347972393036
+      "epoch_time": 908.0901763439178,
+      "elapsed_time": 3640.0536823272705
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   },
   {
     "epoch": 5,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763689287.2151654,
+    "timestamp": 1763725743.4802516,
     "metrics": {
-      "train_loss": 0.8934667744651074,
-      "perplexity": 2.443586346842544,
+      "train_loss": 0.696673156102983,
+      "perplexity": 2.0070643982147294,
       "total_tokens": 5337660.0,
-      "epoch_time": 901.4811086654663,
-      "elapsed_time": 4485.85250377655
+      "epoch_time": 908.2044448852539,
+      "elapsed_time": 4548.287327289581
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   },
   {
     "epoch": 6,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763690188.194487,
+    "timestamp": 1763726651.8753762,
     "metrics": {
-      "train_loss": 0.3480643688178644,
-      "perplexity": 1.4163234138697929,
+      "train_loss": 0.29032064688096687,
+      "perplexity": 1.3368560780404994,
       "total_tokens": 5337660.0,
-      "epoch_time": 900.9515602588654,
-      "elapsed_time": 5386.831972837448
+      "epoch_time": 908.3698897361755,
+      "elapsed_time": 5456.682472705841
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   },
   {
     "epoch": 7,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763691089.1208274,
+    "timestamp": 1763727566.2894776,
     "metrics": {
-      "train_loss": 0.2022040506325117,
-      "perplexity": 1.2240977605517165,
+      "train_loss": 0.17483768743894448,
+      "perplexity": 1.1910528780791527,
       "total_tokens": 5337660.0,
-      "epoch_time": 900.9020256996155,
-      "elapsed_time": 6287.758356332779
+      "epoch_time": 914.385374546051,
+      "elapsed_time": 6371.096319198608
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   },
   {
     "epoch": 8,
     "phase": "pretrain",
     "model_name": "lstmclassifier",
-    "timestamp": 1763691990.7676284,
+    "timestamp": 1763728474.399049,
     "metrics": {
-      "train_loss": 0.14607950243190293,
-      "perplexity": 1.1572881916191402,
+      "train_loss": 0.12919344927933885,
+      "perplexity": 1.1379102307894098,
       "total_tokens": 5337660.0,
-      "epoch_time": 901.6146788597107,
-      "elapsed_time": 7189.40482711792
+      "epoch_time": 908.0798959732056,
+      "elapsed_time": 7279.205981254578
     },
     "learning_rate": 0.0005,
     "batch_size": 32,
     "dataset_size": 10466,
-    "total_parameters": 6632322,
+    "total_parameters": 6830978,
     "model_display_name": "LSTM with Attention"
   }
 ]
