@@ -7,13 +7,13 @@
       "epoch": 1,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763730039.1655858,
+      "timestamp": 1763750319.411575,
       "metrics": {
-        "train_loss": 7.361358354731304,
-        "perplexity": 1573.9731253661585,
+        "train_loss": 7.34902347878712,
+        "perplexity": 1554.6776106644331,
         "total_tokens": 5337660.0,
-        "epoch_time": 961.7183647155762,
-        "elapsed_time": 961.7185099124908
+        "epoch_time": 1075.3281693458557,
+        "elapsed_time": 1075.3282432556152
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -25,13 +25,13 @@
       "epoch": 2,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763731001.2484987,
+      "timestamp": 1763751366.2287219,
       "metrics": {
-        "train_loss": 6.141507044071105,
-        "perplexity": 464.75344728175907,
+        "train_loss": 6.160904759314002,
+        "perplexity": 473.8566071251095,
         "total_tokens": 5337660.0,
-        "epoch_time": 962.043258190155,
-        "elapsed_time": 1923.8013925552368
+        "epoch_time": 1046.721025466919,
+        "elapsed_time": 2122.1453869342804
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -43,13 +43,13 @@
       "epoch": 3,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763731963.0465426,
+      "timestamp": 1763752376.2879434,
       "metrics": {
-        "train_loss": 5.687978154275475,
-        "perplexity": 295.295973767157,
+        "train_loss": 5.709407034443646,
+        "perplexity": 301.69212219651473,
         "total_tokens": 5337660.0,
-        "epoch_time": 961.7478392124176,
-        "elapsed_time": 2885.5994639396667
+        "epoch_time": 1009.977778673172,
+        "elapsed_time": 3132.2044925689697
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -61,13 +61,13 @@
       "epoch": 4,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763732930.6740296,
+      "timestamp": 1763753386.8665953,
       "metrics": {
-        "train_loss": 5.355909718245995,
-        "perplexity": 211.85661854597544,
+        "train_loss": 5.387888213483299,
+        "perplexity": 218.74096324038302,
         "total_tokens": 5337660.0,
-        "epoch_time": 967.5841879844666,
-        "elapsed_time": 3853.2269151210785
+        "epoch_time": 1010.4987487792969,
+        "elapsed_time": 4142.78323507309
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -79,13 +79,13 @@
       "epoch": 5,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763733896.351149,
+      "timestamp": 1763754397.1353087,
       "metrics": {
-        "train_loss": 5.080823497074406,
-        "perplexity": 160.90650742252865,
+        "train_loss": 5.11828147783512,
+        "perplexity": 167.04804703527094,
         "total_tokens": 5337660.0,
-        "epoch_time": 965.6445472240448,
-        "elapsed_time": 4818.904032707214
+        "epoch_time": 1010.1862945556641,
+        "elapsed_time": 5153.052022695541
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -97,13 +97,13 @@
       "epoch": 6,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763734861.7493048,
+      "timestamp": 1763755406.99331,
       "metrics": {
-        "train_loss": 4.469642276080643,
-        "perplexity": 87.32547901279884,
+        "train_loss": 4.8819861106756255,
+        "perplexity": 131.89235674207774,
         "total_tokens": 5337660.0,
-        "epoch_time": 965.3205053806305,
-        "elapsed_time": 5784.302051782608
+        "epoch_time": 1009.7791304588318,
+        "elapsed_time": 6162.909979104996
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -115,13 +115,13 @@
       "epoch": 7,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763735830.619645,
+      "timestamp": 1763756416.9825518,
       "metrics": {
-        "train_loss": 0.7598318551190015,
-        "perplexity": 2.1379167105219095,
+        "train_loss": 2.471046352804434,
+        "perplexity": 11.834823776250493,
         "total_tokens": 5337660.0,
-        "epoch_time": 968.83509516716,
-        "elapsed_time": 6753.172370433807
+        "epoch_time": 1009.9104647636414,
+        "elapsed_time": 7172.899256467819
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -133,13 +133,13 @@
       "epoch": 8,
       "phase": "pretrain",
       "model_name": "gpt",
-      "timestamp": 1763736989.7710714,
+      "timestamp": 1763757426.736062,
       "metrics": {
-        "train_loss": 0.17414946967690456,
-        "perplexity": 1.190233456335572,
+        "train_loss": 0.2766752297104132,
+        "perplexity": 1.3187380145531191,
         "total_tokens": 5337660.0,
-        "epoch_time": 1159.1076946258545,
-        "elapsed_time": 7912.323448181152
+        "epoch_time": 1009.6781299114227,
+        "elapsed_time": 8182.652771949768
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -151,7 +151,7 @@
   "finetune_history": [],
   "best_pretrain": {
     "epoch": 8,
-    "loss": 0.17414946967690456,
-    "perplexity": 1.190233456335572
+    "loss": 0.2766752297104132,
+    "perplexity": 1.3187380145531191
   }
 }

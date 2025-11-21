@@ -7,13 +7,13 @@
       "epoch": 1,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763722110.6459455,
+      "timestamp": 1763741310.0429597,
       "metrics": {
-        "train_loss": 7.510952693660085,
-        "perplexity": 1827.9541939027833,
+        "train_loss": 7.525088090722154,
+        "perplexity": 1853.9765370301056,
         "total_tokens": 5337660.0,
-        "epoch_time": 915.4528253078461,
-        "elapsed_time": 915.4528954029083
+        "epoch_time": 977.1559448242188,
+        "elapsed_time": 977.1560161113739
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -25,13 +25,13 @@
       "epoch": 2,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763723019.1138783,
+      "timestamp": 1763742331.756738,
       "metrics": {
-        "train_loss": 6.153551955048631,
-        "perplexity": 470.3852101340753,
+        "train_loss": 6.17587365173712,
+        "perplexity": 481.0030695744782,
         "total_tokens": 5337660.0,
-        "epoch_time": 908.4289162158966,
-        "elapsed_time": 1823.9207434654236
+        "epoch_time": 1021.6688189506531,
+        "elapsed_time": 1998.869877576828
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -43,13 +43,13 @@
       "epoch": 3,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763723927.1280546,
+      "timestamp": 1763743353.2969134,
       "metrics": {
-        "train_loss": 5.601593319962665,
-        "perplexity": 270.857626663419,
+        "train_loss": 5.626073582870204,
+        "perplexity": 277.57011914464783,
         "total_tokens": 5337660.0,
-        "epoch_time": 907.9883010387421,
-        "elapsed_time": 2731.935128927231
+        "epoch_time": 1021.4648330211639,
+        "elapsed_time": 3020.409961938858
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -61,13 +61,13 @@
       "epoch": 4,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763724835.2467868,
+      "timestamp": 1763744375.2250075,
       "metrics": {
-        "train_loss": 3.0438059677438036,
-        "perplexity": 20.98495951909791,
+        "train_loss": 5.271426491621064,
+        "perplexity": 194.6934930873281,
         "total_tokens": 5337660.0,
-        "epoch_time": 908.0901763439178,
-        "elapsed_time": 3640.0536823272705
+        "epoch_time": 1021.8409116268158,
+        "elapsed_time": 4042.33819770813
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -79,13 +79,13 @@
       "epoch": 5,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763725743.4802516,
+      "timestamp": 1763745397.7118163,
       "metrics": {
-        "train_loss": 0.696673156102983,
-        "perplexity": 2.0070643982147294,
+        "train_loss": 3.3532230337945426,
+        "perplexity": 28.594747119155773,
         "total_tokens": 5337660.0,
-        "epoch_time": 908.2044448852539,
-        "elapsed_time": 4548.287327289581
+        "epoch_time": 1022.4112279415131,
+        "elapsed_time": 5064.824999570847
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -97,13 +97,13 @@
       "epoch": 6,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763726651.8753762,
+      "timestamp": 1763746419.1521952,
       "metrics": {
-        "train_loss": 0.29032064688096687,
-        "perplexity": 1.3368560780404994,
+        "train_loss": 1.04953105656839,
+        "perplexity": 2.8563113555024935,
         "total_tokens": 5337660.0,
-        "epoch_time": 908.3698897361755,
-        "elapsed_time": 5456.682472705841
+        "epoch_time": 1021.3631129264832,
+        "elapsed_time": 6086.2653884887695
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -115,13 +115,13 @@
       "epoch": 7,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763727566.2894776,
+      "timestamp": 1763747441.1934178,
       "metrics": {
-        "train_loss": 0.17483768743894448,
-        "perplexity": 1.1910528780791527,
+        "train_loss": 0.3880108091525915,
+        "perplexity": 1.474045717387116,
         "total_tokens": 5337660.0,
-        "epoch_time": 914.385374546051,
-        "elapsed_time": 6371.096319198608
+        "epoch_time": 1021.9587247371674,
+        "elapsed_time": 7108.306564331055
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -133,13 +133,13 @@
       "epoch": 8,
       "phase": "pretrain",
       "model_name": "lstmclassifier",
-      "timestamp": 1763728474.399049,
+      "timestamp": 1763748462.7631936,
       "metrics": {
-        "train_loss": 0.12919344927933885,
-        "perplexity": 1.1379102307894098,
+        "train_loss": 0.21302579220656942,
+        "perplexity": 1.2374165665357126,
         "total_tokens": 5337660.0,
-        "epoch_time": 908.0798959732056,
-        "elapsed_time": 7279.205981254578
+        "epoch_time": 1021.4873566627502,
+        "elapsed_time": 8129.876345872879
       },
       "learning_rate": 0.0005,
       "batch_size": 32,
@@ -151,7 +151,7 @@
   "finetune_history": [],
   "best_pretrain": {
     "epoch": 8,
-    "loss": 0.12919344927933885,
-    "perplexity": 1.1379102307894098
+    "loss": 0.21302579220656942,
+    "perplexity": 1.2374165665357126
   }
 }

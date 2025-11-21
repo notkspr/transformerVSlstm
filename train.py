@@ -41,7 +41,7 @@ class Config:
     EMBEDDING_DIM = 128
     HIDDEN_DIM = 256
     NUM_LAYERS = 2
-    NUM_HEADS = 2
+    NUM_HEADS = 4
     DROPOUT = 0.1
     
     # Data configuration
