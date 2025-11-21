@@ -40,8 +40,8 @@ class Config:
     MAX_LEN = 512
     EMBEDDING_DIM = 128
     HIDDEN_DIM = 256
-    NUM_LAYERS = 2
-    NUM_HEADS = 1
+    NUM_LAYERS = 1
+    NUM_HEADS = 2
     DROPOUT = 0.1
     
     # Data configuration
